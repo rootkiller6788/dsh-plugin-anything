@@ -1,0 +1,48 @@
+---
+name: dsh-plugin-{{TARGET}}
+description: {{SKILL_DESCRIPTION}}
+whenToUse: {{SKILL_WHEN_TO_USE}}
+---
+
+# {{TARGET}}
+
+{{TARGET}} is {{WHAT_IT_IS}}. This skill covers driving it through the `dsh-plugin-{{TARGET}}` tools.
+
+## Prerequisites
+
+- {{TARGET}} installed and on `PATH`, or its absolute path supplied as the plugin's `command` config.
+- {{ANY_OTHER_REQUIREMENT}}
+
+## Tools
+
+| Tool | Use it for |
+|---|---|
+| `{{TOOL_NAME}}` | {{TOOL_DESCRIPTION}} |
+
+## Workflow
+
+1. {{STEP}}
+2. {{STEP}}
+
+## Notes
+
+- {{GOTCHA}}
+
+<!--
+Frontmatter rules, verified against packages/skill/skill-filesystem/src/index.ts:
+
+- The file MUST open with a line that is exactly `---`, closed by another `---` line.
+  No BOM, no leading blank line.
+- Required: `name` matching /^[a-z0-9]+(?:-[a-z0-9]+)*$/ , and a non-empty `description`.
+- Optional: `whenToUse` (string), `metadata` (opaque object), `disable-model-invocation`, `user-invocable`.
+- Legacy camelCase keys THROW (disableModelInvocation, modelInvocable, userInvocable). Use the kebab-case forms.
+- Booleans accept: true/false, 1/0, true|yes|on, false|no|off.
+- Accepted shapes: a directory bundle `<name>/SKILL.md`, or a flat `<name>.md`.
+  Recursive `**/SKILL.md` is NOT supported.
+- Invalid frontmatter is logged and skipped, never fatal.
+
+Emit this file in BOTH places, mirroring the dual-copy convention:
+  1. `skills/dsh-plugin-{{TARGET}}/SKILL.md` at repo root (the canonical copy).
+  2. `skills/dsh-plugin-{{TARGET}}/SKILL.md` inside the plugin package (the packaged copy that ships
+     in `files` and is mounted by the patch's skill-filesystem row).
+-->

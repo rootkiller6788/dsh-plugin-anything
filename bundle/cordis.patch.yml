@@ -1,0 +1,39 @@
+# dsh-plugin-anything-bundle — bundle patch.
+#
+# Adds the plugin-authoring toolset. It supersedes nothing: the tools it registers are new names, so this
+# layer is a pure insert with no disabled rows.
+
+- insert:
+    - id: plugin-anything
+      name: 'dsh-plugin-anything-bundle'
+      # config:
+      #   # Path to the kit's static gate. Defaults to the `kit` directory
+      #   # resolved from this package, and the verify tool reports plainly when it cannot find it.
+      #   verifierPath: '/abs/path/to/kit/scripts/verify-plugin.mjs'
+      #   # Root under which plugin_anything_scaffold writes new bundles.
+      #   outputDir: !!js dshHomePath('plugin-anything')
+      #   # Where `dsh plugin` runs. Defaults to the current profile's name.
+      #   profile: 'dev'
+
+# ── Ship this bundle's own skill ────────────────────────────────────────────────────────────────────
+#
+# This targets the EXISTING `skill-filesystem` row by id rather than inserting a second one. Inserting
+# another row with the same plugin name mounts a second instance of the provider, which is not what
+# shipping a skill means — `dsh-base` already mounts the provider, and a bundle's job is to tell it where
+# its skills are.
+#
+# The base row carries no `config`, so replacing its whole config loses nothing here. If that ever changes,
+# this patch must restate every key.
+- id: skill-filesystem
+  config:
+    customSkillDirs:
+      # RESOLVING THE PATH — this is the trap, and it fails silently. `!!js` evaluates as
+      # `new Function('ctx','expr','with (ctx) { … }')` (vendor/loader/src/config/utils.ts), so a bare name
+      # resolves to a property of the evaluation context. `baseUrl` is set by app-boot to
+      # `dirname(absoluteConfigPath)` — for a bundle patch that is the PROFILE DIRECTORY, not this package.
+      # The agent-preset idiom `new URL('skills/', baseUrl)` therefore does NOT transfer: here it silently
+      # resolves to `<profile>/skills/`, which does not exist, and the skill never loads.
+      #
+      # Resolve through the package instead. The profile's node_modules is where this bundle is installed,
+      # so createRequire(profileDir).resolve('<pkg>/package.json') lands in the right place.
+      - !!js "process.getBuiltinModule('node:path').dirname(process.getBuiltinModule('node:module').createRequire(baseUrl).resolve('dsh-plugin-anything-bundle/package.json')) + '/skills'"

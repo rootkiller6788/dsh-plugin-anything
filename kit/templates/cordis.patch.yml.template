@@ -1,0 +1,55 @@
+# dsh-plugin-{{TARGET}} — bundle patch.
+#
+# Applied when a profile lists this bundle in `dsh.profile.bundles`. The root is a top-level YAML
+# array; an empty file throws (it parses to nothing, not to a list) — use `[]` to disable the layer.
+#
+# Rules this file must satisfy (each is enforced by a gate in the dsh repo, mirrored by
+# `scripts/verify-plugin.mjs` in the kit):
+#   1. The filename contains `cordis`. The gate's glob is **/*cordis*.yml|yaml.
+#   2. `name:` is the PACKAGE NAME, never a relative path — Node resolution finds the installed code.
+#   3. A bare package name must appear in your package.json `dependencies`.
+#   4. `!!js` is valid ONLY under `config` (any depth) and under `disabled`.
+#   5. Row order carries no load semantics. Sequence plugins with `inject`, not by listing order.
+
+# ── Replace a shipped row, if this plugin supersedes one ────────────────────────────────────────────
+# A patch replaces the targeted row's WHOLE `config`; it does not merge. Restate every key you keep.
+# Disabling rather than deleting is deliberate: a row absent from a surface overlay would silently
+# reappear the day someone reorders the composition.
+#
+# Delete this block when the plugin adds capability instead of replacing it. If you DO supersede a row,
+# confirm the id exists — a patch matching no row is only a stderr warning, never an error, so a typo
+# silently does nothing. Check with: dsh --profile <p> --dump-config | grep <row-id>
+#
+# - id: <the-shipped-row-id-you-replace>
+#   disabled: true
+
+- insert:
+    # ── The plugin itself ───────────────────────────────────────────────────────────────────────────
+    - id: {{TARGET}}
+      name: 'dsh-plugin-{{TARGET}}'
+      # Config keys map 1:1 to the plugin's exported Schemastery `Config`. Every field has a default,
+      # so omitting `config:` entirely is valid; state only what this deployment overrides.
+      # config:
+      #   timeoutMs: 30000
+      #   command: !!js process.env.{{TARGET_UPPER}}_COMMAND
+
+    # ── Skill discovery (only if this plugin ships skills/) ─────────────────────────────────────────
+    #
+    # Do NOT assume the host provides this. `dsh-base` inserts `skill-filesystem` + `tool-skill`, then
+    # `dsh-web-app` disables both so presets own local discovery; only the `cordis` preset re-mounts
+    # `tool-skill`. A plugin that ships a skill must mount its own discovery row.
+    #
+    # RESOLVING THE PATH — read this before editing.
+    # `!!js` expressions evaluate as `new Function('ctx','expr','with (ctx) { … }')` (vendor/loader/src/config/utils.ts),
+    # so a bare name resolves to a property of the evaluation context. `baseUrl` is set by app-boot to
+    # `dirname(absoluteConfigPath)` — for a bundle patch that is the PROFILE DIRECTORY, not this package.
+    # The agent-preset idiom `new URL('skills/', baseUrl)` therefore does NOT transfer here: in a patch it
+    # silently resolves to `<profile>/skills/`, which does not exist.
+    #
+    # Resolve through the package instead. The profile's node_modules is exactly where this bundle is
+    # installed, so createRequire(profileDir).resolve('<pkg>/package.json') lands in the right place.
+    - id: {{TARGET}}-skills
+      name: '@deepseek-ai/dsh-skill-filesystem'
+      config:
+        customSkillDirs:
+          - !!js "process.getBuiltinModule('node:path').dirname(process.getBuiltinModule('node:module').createRequire(baseUrl).resolve('dsh-plugin-{{TARGET}}/package.json')) + '/skills'"

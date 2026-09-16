@@ -1,0 +1,45 @@
+{
+  "irVersion": 1,
+  "target": {
+    "name": "python-calendar",
+    "description": "Render a calendar for a year, using Python's standard-library calendar module.",
+    "source": { "kind": "python", "location": "python3 -m calendar", "version": "3.12" }
+  },
+  "capabilities": [
+    {
+      "id": "year",
+      "name": "Year calendar",
+      "description": "Print the twelve monthly calendars of a year.",
+      "source": { "kind": "python", "location": "python3 -m calendar", "version": "3.12" },
+      "invocation": { "type": "exec", "command": "python3", "args": ["-m", "calendar", "{{year}}"] },
+      "inputs": [
+        { "name": "year", "description": "The year to render, as four digits.", "type": "integer", "required": true }
+      ],
+      "outputs": [{ "name": "stdout", "description": "Twelve monthly calendars, as text.", "type": "string" }],
+      "dependencies": ["python3"],
+      "environment": [],
+      "permissions": { "filesystem": [], "network": [], "process": true, "secrets": [] },
+      "evidence": [{ "stage": "inspect", "observed": "`python3 -m calendar 2026` printed a full year; the module is documented in the standard library" }],
+      "confidence": "observed",
+      "lifecycle": {}
+    },
+    {
+      "id": "month",
+      "name": "Month calendar",
+      "description": "Print one month's calendar.",
+      "source": { "kind": "python", "location": "python3 -m calendar", "version": "3.12" },
+      "invocation": { "type": "exec", "command": "python3", "args": ["-m", "calendar", "{{year}}", "{{month}}"] },
+      "inputs": [
+        { "name": "year", "description": "The year, as four digits.", "type": "integer", "required": true },
+        { "name": "month", "description": "The month, 1 through 12.", "type": "integer", "required": true }
+      ],
+      "outputs": [{ "name": "stdout", "description": "One monthly calendar, as text.", "type": "string" }],
+      "dependencies": ["python3"],
+      "environment": [],
+      "permissions": { "filesystem": [], "network": [], "process": true, "secrets": [] },
+      "evidence": [{ "stage": "inspect", "observed": "`python3 -m calendar 2026 9` printed one month" }],
+      "confidence": "observed",
+      "lifecycle": {}
+    }
+  ]
+}

@@ -1,0 +1,63 @@
+/**
+ * The backend adapter for {{TARGET}} — the ONLY module in this plugin permitted to reach outside the
+ * process. No tool definitions, no schemas, no formatting: plain async functions over the real system.
+ *
+ * This split is what makes the rest of the plugin testable without a live backend. If a second module
+ * starts running subprocesses or issuing network calls, the plugin has lost its testable seam — move
+ * that code here instead.
+ *
+ * @module dsh-plugin-{{TARGET}}/provider
+ */
+
+import { execFile } from 'node:child_process'
+import { promisify } from 'node:util'
+
+const run = promisify(execFile)
+
+/** A resolved handle to the real backend. */
+export interface {{TARGET_CLASS}}Backend {
+  /** The absolute path to the executable this handle drives. */
+  readonly command: string
+}
+
+/**
+ * Locate the {{TARGET}} executable.
+ * @param configured - the `command` config value, or the empty string to resolve from PATH.
+ * @returns a handle to the real backend.
+ * @throws Error when a configured path does not exist or is not executable.
+ */
+export function resolve{{TARGET_CLASS}}(configured: string): {{TARGET_CLASS}}Backend {
+  if (configured === '') {
+    // Resolve from PATH lazily, at the first call, so a plugin that is loaded but never used does not
+    // require the backend to be installed.
+    return { command: '{{TARGET_EXECUTABLE}}' }
+  }
+  return { command: configured }
+}
+
+/**
+ * One invocation of the backend.
+ * @param backend - the resolved backend handle.
+ * @param args - argv passed through unchanged; this module never interprets them.
+ * @param options - invocation controls.
+ * @param options.signal - the caller's abort signal. Honored on every call; a tool always passes
+ *   `exec.signal` here, and an aborted call must reject rather than resolve.
+ * @param options.timeoutMs - cooperative timeout budget for this one call.
+ * @returns the process's stdout and stderr as UTF-8 strings.
+ * @throws Error when the backend exits non-zero, times out, or is aborted.
+ */
+export async function invoke(
+  backend: {{TARGET_CLASS}}Backend,
+  args: readonly string[],
+  options: { signal: AbortSignal; timeoutMs: number },
+): Promise<{ stdout: string; stderr: string }> {
+  // Pass the signal through to execFile rather than racing a timer against it: a racing timer leaks the
+  // child process on abort. `timeout` is the cooperative budget; `signal` is the caller's cancellation.
+  const { stdout, stderr } = await run(backend.command, [...args], {
+    signal: options.signal,
+    timeout: options.timeoutMs,
+    encoding: 'utf8',
+    maxBuffer: 16 * 1024 * 1024,
+  })
+  return { stdout, stderr }
+}

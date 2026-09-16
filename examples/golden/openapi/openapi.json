@@ -1,0 +1,41 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Warehouse",
+    "description": "A small warehouse API: look up items and adjust stock.",
+    "version": "2.1.0"
+  },
+  "servers": [{ "url": "https://warehouse.example.com/api/v2" }],
+  "paths": {
+    "/items": {
+      "get": {
+        "operationId": "listItems",
+        "summary": "List the items in the warehouse.",
+        "parameters": [
+          { "name": "limit", "in": "query", "required": false, "description": "How many items to return.", "schema": { "type": "integer" } },
+          { "name": "status", "in": "query", "required": false, "description": "Only items in this state.", "schema": { "type": "string", "enum": ["in-stock", "backorder", "discontinued"] } }
+        ],
+        "responses": { "200": { "description": "The items." } }
+      }
+    },
+    "/items/{sku}": {
+      "get": {
+        "operationId": "getItem",
+        "summary": "Look up one item by SKU.",
+        "parameters": [
+          { "name": "sku", "in": "path", "required": true, "description": "The stock-keeping unit.", "schema": { "type": "string" } }
+        ],
+        "responses": { "200": { "description": "The item." }, "404": { "description": "No such item." } }
+      },
+      "patch": {
+        "operationId": "adjustStock",
+        "summary": "Adjust an item's stock level.",
+        "parameters": [
+          { "name": "sku", "in": "path", "required": true, "description": "The stock-keeping unit.", "schema": { "type": "string" } },
+          { "name": "delta", "in": "query", "required": true, "description": "How much to add or remove.", "schema": { "type": "integer" } }
+        ],
+        "responses": { "200": { "description": "The updated item." } }
+      }
+    }
+  }
+}

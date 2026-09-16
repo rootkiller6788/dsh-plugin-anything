@@ -1,0 +1,72 @@
+{
+  "$comment": [
+    "Runtime metadata the registry entry format does not carry.",
+    "",
+    "`awesome-dsh-plugin` entries are probe output: url, name, category, description, and an optional tarball.",
+    "The list's own prober answers exactly one question — does the repository declare `dsh.bundle.patch` in",
+    "its package.json? — so `installable: true` says a bundle exists, not that it will run here.",
+    "",
+    "That leaves three things a user cannot learn from the registry and the market cannot answer: what the",
+    "plugin exposes, what it needs installed, and which dsh line it was built against. This file carries",
+    "them. Nothing reads it yet; that is the point — it is the field set proposed for the entry format, kept",
+    "in the package so it can be adopted incrementally without breaking the existing consumers.",
+    "",
+    "See kit/guides/registry-entry.md."
+  ],
+  "name": "dsh-plugin-anything-bundle",
+  "version": "0.1.0",
+  "requires": [],
+  "requiresNotes": "Nothing beyond Node. The tools shell out to `dsh` and `node`, both of which are already present wherever this plugin is installed. `plugin_anything_promote` additionally requires the `dynamicCordisRunner` service and does not register without it.",
+  "dshRange": "^0.1.5-rc.2",
+  "builtAgainst": "0.1.5-rc.2",
+  "dshRangeNotes": "dsh publishes no stable release. A range without a prerelease tag (^0.1.5) resolves to nothing, and a range is line-specific: this one does not admit 0.1.6-alpha.1.",
+  "skillMd": "bundle/skills/dsh-plugin-anything-bundle/SKILL.md",
+  "skills": [
+    "dsh-plugin-anything-bundle"
+  ],
+  "tools": [
+    {
+      "name": "plugin_anything_probe",
+      "purpose": "Classify a target as a CLI, an HTTP API, or an MCP server, and gather evidence that it is actually callable. Reports `kind: mcp` as a stop condition."
+    },
+    {
+      "name": "plugin_anything_inspect",
+      "purpose": "Gather what a target actually offers as normalised evidence: version, subcommands with verbatim help text, top-level flags. Collects facts and reports its own gaps; does not extract capabilities."
+    },
+    {
+      "name": "plugin_anything_scaffold",
+      "purpose": "Write a bundle skeleton from the kit's templates. Existing files are never overwritten; unresolved placeholders become visible TODO markers."
+    },
+    {
+      "name": "plugin_anything_verify",
+      "purpose": "Run the kit's static gate over a bundle. Reports a failure rather than a pass when it cannot locate the gate."
+    },
+    {
+      "name": "plugin_anything_install",
+      "purpose": "Install a bundle into a profile and confirm its layer composed, grepping the row id because a patch that matches no row only warns."
+    },
+    {
+      "name": "plugin_anything_promote",
+      "purpose": "Capture a live dynamic cordis package as source on disk so it can be converted into a real bundle. Writes an intermediate artifact, not a finished bundle.",
+      "conditional": "Registers only where `dynamicCordisRunner` is mounted — the dsh-web-app bundle provides it; dsh-base does not."
+    }
+  ],
+  "toolCount": 6,
+  "toolCountWithoutCordisRuntime": 5,
+  "verified": {
+    "note": "What has evidence, and what does not. See docs/runtime-acceptance.md.",
+    "against": "dsh 0.1.5-rc.2, in a real profile",
+    "verified": [
+      "installs, composes, loads, registers, and persists across restarts",
+      "the model lists all tools and calls plugin_anything_probe successfully",
+      "a presenter renders from a real logged tool/result",
+      "the bundle ships its own skill, discovered via createRequire",
+      "promote reads a real dynamic package created by cordis_define"
+    ],
+    "unverified": [
+      "no stable dsh release exists to test against",
+      "the promoted output has not been produced end to end without a human completing the source conversion"
+    ]
+  },
+  "categoryRationale": "`tools` — the plugin's output is tools. It compares with the entry format's other categories: `dev` covers development workflows, `skill` covers skill delivery, and this does neither."
+}

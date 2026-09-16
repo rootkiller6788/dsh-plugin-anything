@@ -1,0 +1,25 @@
+{
+  "irVersion": 1,
+  "target": {
+    "name": "npm-pack-cli",
+    "description": "Inspect what an npm package would publish, without publishing it.",
+    "source": { "kind": "npm", "location": "npm", "version": "11.5.2" }
+  },
+  "capabilities": [
+    {
+      "id": "pack-listing",
+      "name": "Pack listing",
+      "description": "List exactly which files a package would ship, and how large the tarball would be.",
+      "source": { "kind": "npm", "location": "npm", "version": "11.5.2" },
+      "invocation": { "type": "exec", "command": "npm", "args": ["pack", "--dry-run", "--json"] },
+      "inputs": [],
+      "outputs": [{ "name": "stdout", "description": "One JSON array describing the artifact and its files.", "type": "string" }],
+      "dependencies": ["npm"],
+      "environment": [],
+      "permissions": { "filesystem": ["./**"], "network": [], "process": true, "secrets": [] },
+      "evidence": [{ "stage": "inspect", "observed": "`npm pack --dry-run --json` printed the file listing in the working directory; documented by `npm pack --help`" }],
+      "confidence": "confirmed",
+      "lifecycle": {}
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+# Every text file in this repository is compared byte-for-byte by a gate: the shipped copies in `bundle/`
+# against the kit's originals, and the committed example against what the templates currently render. A
+# line-ending conversion on checkout fails those checks for reasons that have nothing to do with the change,
+# which trains a reader to ignore them.
+#
+# So: normalise to LF in the repository and in the working tree, on every platform.
+* text=auto eol=lf
+
+# Binary, for the benefit of the diff viewer. Nothing here is committed yet, but a `.gitattributes` that only
+# covers the files present today is one somebody has to remember to update.
+*.png binary
+*.jpg binary
+*.gif binary
+*.webp binary
+*.tgz binary
+*.zstd binary

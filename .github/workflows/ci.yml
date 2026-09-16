@@ -1,0 +1,206 @@
+name: CI
+
+# Both halves of this repository are dependency-free by design, so CI needs no install step. That is
+# deliberate: the gate has to be runnable by a contributor on a fresh checkout with nothing set up, or it
+# will not be run before a push.
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  kit:
+    name: Kit structure and gate
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # The kit's own structure: every required file present, and every guide reachable from HARNESS.md.
+      - name: Kit structure
+        run: node kit/scripts/verify-plugin.mjs --kit
+
+      # Every check the gate implements, exercised against a mutant that must fail it.
+      - name: Gate acceptance tests
+        run: node --test kit/tests/verify-plugin.test.mjs
+
+  examples:
+    name: Rendered examples
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # Rendering is pure, so it runs without @deepseek-ai/* installed.
+      - name: Renderer unit tests
+        run: node --experimental-strip-types --test tests/scaffold.test.mjs
+        working-directory: bundle
+
+      # The test that ties the halves together: render from the real templates, then run the real gate.
+      # A template edit that breaks the contract fails here rather than in a user's profile.
+      - name: Generation pipeline
+        run: node --experimental-strip-types --test tests/pipeline.test.mjs
+        working-directory: bundle
+
+      - name: Committed examples pass the gate
+        run: |
+          for dir in examples/*/; do
+            echo "verifying $dir"
+            node kit/scripts/verify-plugin.mjs "$dir"
+          done
+
+      # The committed example must equal what the templates currently render, or CI keeps validating a
+      # stale artifact while the templates move on.
+      - name: Committed example is current
+        run: |
+          node --experimental-strip-types bundle/scripts/render-example.mjs git
+          git diff --exit-code -- examples/
+
+  typecheck:
+    name: Generated code compiles against the real dsh types
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+
+      # The kit's own checks need no install; this one does, because the whole point is to compile the
+      # generated code against the real `@deepseek-ai/dsh-tools` declarations rather than a stub.
+      - name: Install
+        run: pnpm install --no-frozen-lockfile
+        working-directory: bundle
+
+      - name: Bundle typechecks
+        run: npx tsc --noEmit -p tsconfig.json
+        working-directory: bundle
+
+      # Renders a bundle from the real templates and compiles it. This is the gate that catches a template
+      # edit which produces code that looks right, passes the format gate, and does not compile —
+      # `presentResult` treating its `ToolResult` as the canonical value being the historical example.
+      - name: A rendered bundle compiles
+        run: node --experimental-strip-types scripts/typecheck-example.mjs
+        working-directory: bundle
+
+      # The build must produce the artifact the manifest actually points at. Without `fixedExtension: false`
+      # tsdown emits `lib/index.mjs` while `main` says `lib/index.js`: a green build and an unloadable
+      # package.
+      - name: The built artifact matches the manifest
+        run: |
+          npx tsdown
+          node -e "
+            const { readFileSync, existsSync } = require('node:fs')
+            const main = JSON.parse(readFileSync('package.json', 'utf8')).main
+            if (!existsSync(main)) {
+              console.error(\`::error::main is '\${main}' but the build did not produce it\`)
+              process.exit(1)
+            }
+            console.log(\`ok: build produced \${main}\`)
+          "
+
+      # Composition and load are proven by a real `dsh`; everything below is proven here, against the built
+      # artifact, without a model or a key.
+      - name: The built bundle registers its tools
+        run: node --test tests/registration.test.mjs
+        working-directory: bundle
+
+      # Presenters, replayed against a transcript a real `dsh` logged. The fixture is that transcript.
+      - name: Presenters replay
+        run: node --test tests/presenter-replay.test.mjs
+        working-directory: bundle
+
+      # The runner's real API shape: service name, method name, and argument order.
+      - name: Promote matches the runner API
+        run: node --test tests/promote.test.mjs
+        working-directory: bundle
+
+      # The whole deterministic ladder in one command, ending with a report of where the keyed steps begin.
+      # It is the same script a contributor runs locally, so CI and a human see the same thing.
+      - name: Acceptance ladder
+        run: node scripts/acceptance.mjs
+        env:
+          # No profile exists in CI, so rungs 6–7 report SKIPPED rather than failing. The composition and
+          # boot rungs are covered by the `composition` job below, against a real dsh.
+          DSH_HOME: ${{ github.workspace }}/.dsh-home
+
+  registry:
+    name: Registry entry against the list's own rules
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      # The validator reads CAT_IDS and slugFor out of this checkout's source and evaluates them, so the
+      # entry is checked against the rules as they are today rather than against a copy of them.
+      - name: Check out the list whose rules apply
+        uses: actions/checkout@v4
+        with:
+          repository: HKUDS/awesome-dsh-plugin
+          path: upstream-list
+        continue-on-error: true
+
+      - name: Validate the entry
+        run: |
+          if [ ! -d upstream-list/scripts ]; then
+            echo "::warning::the upstream list could not be fetched; the registry rung did not run"
+            exit 0
+          fi
+          node scripts/validate-registry-entry.mjs --upstream "$PWD/upstream-list"
+
+  composition:
+    name: Composition against a real dsh
+    runs-on: ubuntu-latest
+    env:
+      # The published CLI, pinned. The bundle's peer range must admit it — see the note in scaffold.ts
+      # about why the range needs its prerelease tag.
+      DSH_VERSION: 0.1.5-rc.2
+      DSH_HOME: ${{ github.workspace }}/.dsh-home
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - uses: pnpm/action-setup@v4
+
+      - name: Install and build the bundle
+        run: |
+          pnpm install --no-frozen-lockfile
+          npx tsdown
+        working-directory: bundle
+
+      # Layer 3 of guides/verification.md: only dsh can validate the composed tree.
+      - name: The bundle composes into a profile
+        run: |
+          npx --yes "@deepseek-ai/dsh@${DSH_VERSION}" plugin --profile ci add "$PWD/bundle"
+          dump=$(npx --yes "@deepseek-ai/dsh@${DSH_VERSION}" --profile ci --dump-config)
+          echo "$dump" | grep -q 'dsh-plugin-anything-bundle' \
+            || { echo '::error::the bundle layer is absent from --dump-config'; exit 1; }
+          # A patch that matches no row is only a stderr warning, so the row id is asserted explicitly.
+          echo "$dump" | grep -q 'id: plugin-anything' \
+            || { echo '::error::the patch row id did not resolve'; exit 1; }
+          echo 'ok: layer and row id both present'
+
+      # Loading is proven by WHERE the failure lands. A keyless run must reach the model request and fail
+      # on the missing credential; a load failure would surface earlier, naming our plugin. So asserting
+      # the credential error asserts that every plugin — ours included — settled and ran its `apply`.
+      - name: The bundle loads without throwing
+        run: |
+          out=$(npx --yes "@deepseek-ai/dsh@${DSH_VERSION}" --profile ci "hi" 2>&1 || true)
+          echo "$out"
+          echo "$out" | grep -q 'MISSING_CREDENTIAL' \
+            || { echo '::error::expected the run to reach the model request; the plugin tree did not settle'; exit 1; }
+          # `if`, not `&&`: a passing grep returns 0 and a failing one returns 1, and under the shell's
+          # `set -e` a bare failing `&&` chain fails the step — reporting the opposite of what it found.
+          if echo "$out" | grep -q 'plugin-anything'; then
+            echo '::error::our plugin appeared in a load error'
+            exit 1
+          fi
+          echo 'ok: the tree settled and the failure is the missing credential'

@@ -1,0 +1,14 @@
+node_modules/
+lib/
+dist/
+coverage/
+*.log
+.DS_Store
+.vitest-cache/
+tsconfig.tsbuildinfo
+.typecheck-*
+*.tgz
+
+# A byproduct of running the promote E2E by hand. No script regenerates it, and committing an artifact
+# nothing can reproduce is the drift class the rest of this repository spends its gates preventing.
+.acceptance/

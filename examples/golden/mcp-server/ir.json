@@ -1,0 +1,27 @@
+{
+  "irVersion": 1,
+  "target": {
+    "name": "filesystem-mcp",
+    "description": "An MCP server exposing filesystem tools.",
+    "source": { "kind": "mcp", "location": "https://mcp.example.com/filesystem" }
+  },
+  "capabilities": [
+    {
+      "id": "read-file",
+      "name": "Read file",
+      "description": "Read a file through the MCP server.",
+      "source": { "kind": "mcp", "location": "https://mcp.example.com/filesystem" },
+      "invocation": { "type": "mcp", "transport": "filesystem" },
+      "inputs": [
+        { "name": "path", "description": "The file to read.", "type": "string", "required": true }
+      ],
+      "outputs": [{ "name": "content", "description": "The file's contents.", "type": "string" }],
+      "dependencies": [],
+      "environment": [],
+      "permissions": { "filesystem": ["**"], "network": ["mcp.example.com"], "process": false, "secrets": [] },
+      "evidence": [{ "stage": "detect", "observed": "the endpoint answered a tools/list request, so it speaks MCP" }],
+      "confidence": "confirmed",
+      "lifecycle": {}
+    }
+  ]
+}

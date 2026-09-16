@@ -1,0 +1,27 @@
+{
+  "irVersion": 1,
+  "target": {
+    "name": "port-check",
+    "description": "Report whether a TCP port on this machine is accepting connections.",
+    "source": { "kind": "script", "location": "./port-check.sh" }
+  },
+  "capabilities": [
+    {
+      "id": "check",
+      "name": "Check a port",
+      "description": "Report whether a port is open, and which process is listening on it when the platform can say.",
+      "source": { "kind": "script", "location": "./port-check.sh" },
+      "invocation": { "type": "exec", "command": "bash", "args": ["./port-check.sh", "{{port}}"] },
+      "inputs": [
+        { "name": "port", "description": "The TCP port to check, 1 through 65535.", "type": "integer", "required": true }
+      ],
+      "outputs": [{ "name": "stdout", "description": "One line: open or closed, with the listening process when known.", "type": "string" }],
+      "dependencies": ["bash"],
+      "environment": [],
+      "permissions": { "filesystem": ["./port-check.sh"], "network": ["localhost"], "process": true, "secrets": [] },
+      "evidence": [{ "stage": "inspect", "observed": "read the script; it takes one positional port and prints a single status line" }],
+      "confidence": "observed",
+      "lifecycle": {}
+    }
+  ]
+}

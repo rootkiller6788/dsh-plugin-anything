@@ -1,0 +1,62 @@
+{
+  "irVersion": 1,
+  "target": {
+    "name": "git",
+    "description": "Inspect a repository's working tree, history, and changes.",
+    "source": { "kind": "cli", "location": "/usr/bin/git", "version": "2.50.1" }
+  },
+  "capabilities": [
+    {
+      "id": "status",
+      "name": "Status",
+      "description": "Show which files are modified, staged, or untracked.",
+      "source": { "kind": "cli", "location": "/usr/bin/git", "version": "2.50.1" },
+      "invocation": { "type": "exec", "command": "git", "args": ["-C", "{{repository}}", "status", "--porcelain=v1"] },
+      "inputs": [
+        { "name": "repository", "description": "Absolute path to the repository.", "type": "string", "required": true }
+      ],
+      "outputs": [{ "name": "stdout", "description": "One porcelain status line per changed path.", "type": "string" }],
+      "dependencies": [],
+      "environment": [],
+      "permissions": { "filesystem": ["{{repository}}/**"], "network": [], "process": true, "secrets": [] },
+      "evidence": [{ "stage": "inspect", "observed": "`git status --porcelain=v1` printed the modified paths; the subcommand appears in `git --help`" }],
+      "confidence": "observed",
+      "lifecycle": {}
+    },
+    {
+      "id": "log",
+      "name": "Log",
+      "description": "List recent commits, newest first.",
+      "source": { "kind": "cli", "location": "/usr/bin/git", "version": "2.50.1" },
+      "invocation": { "type": "exec", "command": "git", "args": ["-C", "{{repository}}", "log", "--oneline", "--max-count", "{{limit}}"] },
+      "inputs": [
+        { "name": "repository", "description": "Absolute path to the repository.", "type": "string", "required": true },
+        { "name": "limit", "description": "How many commits to list.", "type": "integer", "required": false }
+      ],
+      "outputs": [{ "name": "stdout", "description": "One abbreviated commit per line.", "type": "string" }],
+      "dependencies": [],
+      "environment": [],
+      "permissions": { "filesystem": ["{{repository}}/**"], "network": [], "process": true, "secrets": [] },
+      "evidence": [{ "stage": "inspect", "observed": "`git log --oneline` printed the commit list; `--max-count` is documented in `git log --help`" }],
+      "confidence": "observed",
+      "lifecycle": {}
+    },
+    {
+      "id": "diff",
+      "name": "Diff",
+      "description": "Show the unstaged changes in a repository.",
+      "source": { "kind": "cli", "location": "/usr/bin/git", "version": "2.50.1" },
+      "invocation": { "type": "exec", "command": "git", "args": ["-C", "{{repository}}", "diff", "--no-color"] },
+      "inputs": [
+        { "name": "repository", "description": "Absolute path to the repository.", "type": "string", "required": true }
+      ],
+      "outputs": [{ "name": "stdout", "description": "A unified diff.", "type": "string" }],
+      "dependencies": [],
+      "environment": [],
+      "permissions": { "filesystem": ["{{repository}}/**"], "network": [], "process": true, "secrets": [] },
+      "evidence": [{ "stage": "inspect", "observed": "`git diff --no-color` printed a unified diff" }],
+      "confidence": "observed",
+      "lifecycle": {}
+    }
+  ]
+}

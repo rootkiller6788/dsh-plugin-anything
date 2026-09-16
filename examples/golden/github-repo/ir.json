@@ -1,0 +1,46 @@
+{
+  "irVersion": 1,
+  "target": {
+    "name": "ripgrep-repo",
+    "description": "Search a checkout of the ripgrep repository: its source layout, its build, and its tests.",
+    "source": { "kind": "repo", "location": "https://github.com/BurntSushi/ripgrep" }
+  },
+  "capabilities": [
+    {
+      "id": "file-listing",
+      "name": "File listing",
+      "description": "List the repository's tracked files, so a reader can see its shape before opening anything.",
+      "source": { "kind": "repo", "location": "https://github.com/BurntSushi/ripgrep" },
+      "invocation": { "type": "exec", "command": "git", "args": ["-C", "{{checkout}}", "ls-files"] },
+      "inputs": [
+        { "name": "checkout", "description": "Absolute path to the repository checkout.", "type": "string", "required": true }
+      ],
+      "outputs": [{ "name": "stdout", "description": "One tracked path per line.", "type": "string" }],
+      "dependencies": ["git"],
+      "environment": [],
+      "permissions": { "filesystem": ["{{checkout}}/**"], "network": [], "process": true, "secrets": [] },
+      "evidence": [{ "stage": "inspect", "observed": "the repository has a git tree; `git ls-files` lists it without a network call" }],
+      "confidence": "observed",
+      "lifecycle": {}
+    },
+    {
+      "id": "cargo-test",
+      "name": "Run the test suite",
+      "description": "Run the repository's Rust test suite and report the outcome.",
+      "source": { "kind": "repo", "location": "https://github.com/BurntSushi/ripgrep" },
+      "invocation": { "type": "exec", "command": "cargo", "args": ["test", "--quiet", "--manifest-path", "{{checkout}}/Cargo.toml"] },
+      "inputs": [
+        { "name": "checkout", "description": "Absolute path to the repository checkout.", "type": "string", "required": true }
+      ],
+      "outputs": [{ "name": "stdout", "description": "The test summary.", "type": "string" }],
+      "dependencies": ["cargo"],
+      "environment": [],
+      "permissions": { "filesystem": ["{{checkout}}/**"], "network": [], "process": true, "secrets": [] },
+      "evidence": [{ "stage": "inspect", "observed": "the repository declares a Cargo.toml, so `cargo test` is its test entry point" }],
+      "confidence": "observed",
+      "lifecycle": {
+        "setup": "cargo may fetch its registry index on first use"
+      }
+    }
+  ]
+}

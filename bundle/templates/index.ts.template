@@ -1,0 +1,77 @@
+/**
+ * Model-facing tools over {{TARGET}}.
+ *
+ * This package owns schemas, argument validation, and formatting. It never reimplements {{TARGET}}:
+ * every call that touches the real system goes through `./provider.ts`, which is the only module here
+ * permitted to reach outside the process.
+ *
+ * @module dsh-plugin-{{TARGET}}
+ */
+
+import type { Context } from '@deepseek-ai/cordis'
+import z from '@deepseek-ai/schemastery'
+import { resolve{{TARGET_CLASS}} } from './provider.ts'
+{{TOOL_IMPORTS}}
+
+/** Cordis plugin name used by loader diagnostics. */
+export const name = '{{TARGET}}'
+
+/** Services required by this plugin. `tools` is the registry everything here registers into. */
+export const inject = ['tools']
+
+/** Plugin config. Every field has a default, so a deployment states only what it overrides. */
+export interface Config {
+  /**
+   * Absolute path to the {{TARGET}} executable.
+   * Omit to resolve it from PATH at startup.
+   */
+  command?: string
+  /** Cooperative timeout budget for one backend call, in milliseconds. */
+  timeoutMs?: number
+}
+
+/** Schemastery validation for {@link Config}. Not to be confused with a tool's parameter schema. */
+export const Config: z<Config> = z.object({
+  command: z.string().default(''),
+  timeoutMs: z.number().default(30_000),
+})
+
+/** The config shape after Schemastery applied the defaults. */
+type ResolvedConfig = Required<Config>
+
+/**
+ * Reject values that would fail silently later.
+ * A non-positive timeout does not error at the call site — it makes the abort fire immediately, which
+ * reads as a backend failure. Fail loud here instead.
+ * @param field - config field name, for the message.
+ * @param value - the resolved value to check.
+ * @throws Error when `value` is not a positive finite number.
+ */
+function assertPositiveTimeout(field: string, value: number): void {
+  if (!Number.isFinite(value) || value <= 0) {
+    throw new Error(`dsh-plugin-{{TARGET}}: ${field} must be a positive finite number`)
+  }
+}
+
+/**
+ * Resolve the backend and register the {{TARGET}} tools.
+ * @param ctx - the calling plugin's context; every registration below is owned by this fiber and
+ *   disposed with it, so no manual cleanup is needed.
+ * @param config - validated plugin config; Schemastery has already filled every defaulted field.
+ * @throws Error when the config is invalid or the backend cannot be found.
+ */
+export function apply(ctx: Context, config: Config): void {
+  const resolved = config as ResolvedConfig
+  assertPositiveTimeout('timeoutMs', resolved.timeoutMs)
+
+  // Fail loud at load rather than at the first tool call: a missing backend is a hard dependency
+  // problem, and this is the earliest point where it is self-contained.
+  const backend = resolve{{TARGET_CLASS}}(resolved.command)
+
+  const options = { backend, timeoutMs: resolved.timeoutMs }
+
+{{TOOL_REGISTRATIONS}}
+
+  // Register conditionally when a capability may be absent, so the tool never appears without it:
+  // ctx.inject(['someService'], (scopedCtx) => { applySomeTool(scopedCtx, options) })
+}

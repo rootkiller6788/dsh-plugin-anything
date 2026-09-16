@@ -1,0 +1,17 @@
+# Registry entry for `awesome-dsh-plugin`, in that list's submission format.
+#
+# Filename must equal `slugFor(url)` — `scripts/validate-registry-entry.mjs` checks it against the upstream
+# implementation rather than trusting this comment.
+#
+# STATUS: NOT SUBMITTABLE YET. The `url` is a placeholder because this plugin has no public repository.
+# The list's `contributing.md` requires the repository to be at least one day old with at least ten
+# commits, to carry the `dsh-plugin` GitHub topic, and to declare `dsh.bundle` in its `package.json` —
+# a repository created today cannot satisfy the first of those no matter how good the plugin is.
+# Everything else about this entry is final.
+
+url: https://github.com/OWNER/dsh-plugin-anything
+name: dsh-plugin-anything-bundle
+category: tools
+description:
+  en: Generates, verifies, and installs DeepSeek Harness plugin bundles for arbitrary targets — external CLIs, HTTP APIs, and local services — including promoting a live dynamic cordis package into a real on-disk bundle.
+  zh: 为任意目标（外部 CLI、HTTP API、本地服务）生成、验证并安装 DeepSeek Harness 插件包，并可将运行时动态 cordis 包提升为磁盘上的真实 bundle。
