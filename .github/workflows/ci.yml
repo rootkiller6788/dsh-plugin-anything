@@ -9,6 +9,16 @@ on:
     branches: [main]
   pull_request:
 
+env:
+  # `pnpm/action-setup` takes its version from one of two places: a `packageManager` field in the root
+  # `package.json`, or its own `version` input. This repository has no root manifest — the only
+  # `package.json` files are `bundle/`'s and the rendered example's — so it has to be named here. Without
+  # it the action fails before a single step of the job runs, which is what both pnpm jobs were doing.
+  #
+  # `11`, because that is the major this repository is installed with: `bundle/pnpm-lock.yaml` is committed
+  # at `lockfileVersion: '9.0'`, which is the format pnpm 11 writes.
+  PNPM_VERSION: '11'
+
 jobs:
   kit:
     name: Kit structure and gate
@@ -47,9 +57,13 @@ jobs:
         run: node --experimental-strip-types --test tests/pipeline.test.mjs
         working-directory: bundle
 
+      # `examples/` holds two different things: rendered bundles, which must pass the gate, and `golden/`, a
+      # tree of IR fixtures that is not a plugin at all. Globbing `examples/*/` conflated them, so this job
+      # failed on a directory it was never meant to gate. The glob now follows the project's own bundle
+      # naming convention, so a new bundle is gated automatically and fixtures are not.
       - name: Committed examples pass the gate
         run: |
-          for dir in examples/*/; do
+          for dir in examples/dsh-plugin-*/; do
             echo "verifying $dir"
             node kit/scripts/verify-plugin.mjs "$dir"
           done
@@ -78,6 +92,8 @@ jobs:
         with:
           node-version: '22'
       - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
 
       # The kit's own checks need no install; this one does, because the whole point is to compile the
       # generated code against the real `@deepseek-ai/dsh-tools` declarations rather than a stub.
@@ -177,6 +193,8 @@ jobs:
         with:
           node-version: '22'
       - uses: pnpm/action-setup@v4
+        with:
+          version: ${{ env.PNPM_VERSION }}
 
       - name: Install and build the bundle
         run: |
