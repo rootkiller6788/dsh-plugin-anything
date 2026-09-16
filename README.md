@@ -1,6 +1,10 @@
 <h1 align="center">dsh-plugin-anything</h1>
 
 <p align="center">
+  <img src="assets/overview.png" alt="Overview of the project: the compiler (frontends into a Capability IR, then out to a plugin bundle), the twenty-stage pipeline with each stage's owner, the acceptance verdict table, and the runtime call chain">
+</p>
+
+<p align="center">
   <strong>Turn anything into a DeepSeek Harness plugin.</strong><br>
   One pipeline, one compiler, one verifier — for the harness where <em>everything is already a plugin</em>.
 </p>
@@ -8,6 +12,15 @@
 <p align="center">
   <em>An agent-native compiler and verification pipeline that turns software capabilities into
   installable, tested, and verified DSH plugins.</em>
+</p>
+
+<p align="center">
+  <a href="https://github.com/rootkiller6788/dsh-plugin-anything/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/rootkiller6788/dsh-plugin-anything/ci.yml?style=flat&label=CI" alt="CI status"></a>
+  <a href="https://github.com/rootkiller6788/dsh-plugin-anything"><img src="https://img.shields.io/github/stars/rootkiller6788/dsh-plugin-anything?style=flat&label=%E2%98%85&color=08C" alt="GitHub stars"></a>
+  <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2EA44F?style=flat" alt="MIT License"></a>
+  <img src="https://img.shields.io/badge/dsh-0.1.5--rc.2-4D6BFE?style=flat" alt="DeepSeek Harness 0.1.5-rc.2">
+  <img src="https://img.shields.io/badge/Node-22.19%2B%20%7C%20%E2%89%A524-339933?style=flat" alt="Node 22.19+ or 24+">
+  <img src="https://img.shields.io/badge/TypeScript-6-3178C6?style=flat" alt="TypeScript 6">
 </p>
 
 ---
