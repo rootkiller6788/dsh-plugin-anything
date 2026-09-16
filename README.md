@@ -15,6 +15,10 @@
 </p>
 
 <p align="center">
+  <img src="assets/fun.png" alt="Three-panel comic: the struggle of wiring up every tool by hand, the discovery that dsh-plugin-anything compiles anything — a CLI, an API, a local service, a package, a repository — into a plugin through a Capability IR, and the transformation into a DSH plugin market where the git, Python, npm, OpenAPI, GitHub, and local-script plugins all read as installed">
+</p>
+
+<p align="center">
   <a href="https://github.com/rootkiller6788/dsh-plugin-anything/actions/workflows/ci.yml"><img src="https://img.shields.io/github/actions/workflow/status/rootkiller6788/dsh-plugin-anything/ci.yml?style=flat&label=CI" alt="CI status"></a>
   <a href="https://github.com/rootkiller6788/dsh-plugin-anything"><img src="https://img.shields.io/github/stars/rootkiller6788/dsh-plugin-anything?style=flat&label=%E2%98%85&color=08C" alt="GitHub stars"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2EA44F?style=flat" alt="MIT License"></a>
