@@ -61,6 +61,14 @@ jobs:
           node --experimental-strip-types bundle/scripts/render-example.mjs git
           git diff --exit-code -- examples/
 
+      # The bundle ships its own copies of the SOP, the templates, the gate, and the license, because a
+      # user who installs from a tarball has no repository around them. Those copies were pinned here to
+      # stop them drifting — but the pinning script was never run by CI, so "pinned" meant "pinned until
+      # somebody forgets", which is the failure mode the script exists to prevent. It is dependency-free:
+      # it needs nothing installed, which is why it belongs in this job.
+      - name: Shipped copies match the kit
+        run: node scripts/check-shipped-copies.mjs
+
   typecheck:
     name: Generated code compiles against the real dsh types
     runs-on: ubuntu-latest

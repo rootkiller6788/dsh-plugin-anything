@@ -166,4 +166,7 @@ test('this package ships everything its own code reads', { skip: !existsSync(joi
   for (const required of ['templates/package.json.template', 'scripts/verify-plugin.mjs', 'sop/SOP.md', 'skills/dsh-plugin-anything-bundle/SKILL.md']) {
     assert.ok(shipped.has(required), `${required} does not ship, so an installed copy cannot read it`)
   }
+  // `LICENSE` is not read by any code, which is exactly why it needs a test: nothing would notice it
+  // dropping out of the tarball. The package declares MIT, so the text has to be in there.
+  assert.ok(shipped.has('LICENSE'), 'LICENSE does not ship, so the package asserts MIT without carrying it')
 })

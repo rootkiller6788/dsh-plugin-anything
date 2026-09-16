@@ -257,4 +257,6 @@ warns that compatibility-breaking changes will land, so the version you peer on 
 
 ## License
 
-MIT
+MIT — see [`LICENSE`](LICENSE). The published bundle carries the same text, and
+[`scripts/check-shipped-copies.mjs`](scripts/check-shipped-copies.mjs) pins the two together, so a change to
+one cannot quietly leave the other asserting the old terms.

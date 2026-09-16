@@ -34,6 +34,11 @@ const COPIES = [
   { from: join(KIT, 'HARNESS.md'), to: join(BUNDLE, 'sop', 'SOP.md') },
   { from: join(KIT, 'scripts', 'verify-plugin.mjs'), to: join(BUNDLE, 'scripts', 'verify-plugin.mjs') },
   { from: join(REPO, 'docs', 'runtime-acceptance.md'), to: join(BUNDLE, 'docs', 'runtime-acceptance.md') },
+  // The bundle is published to npm under `"license": "MIT"`, and a tarball has no repository around it — so
+  // the license text has to travel inside the package. That makes it a copy like any other, and a copy that
+  // is not pinned is a second source of truth: the day the holder or the year changes, one of the two files
+  // changes and the published package keeps asserting the old one.
+  { from: join(REPO, 'LICENSE'), to: join(BUNDLE, 'LICENSE') },
 ]
 
 // The templates are a directory of files, copied one for one.

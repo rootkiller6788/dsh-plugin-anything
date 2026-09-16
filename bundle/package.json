@@ -19,6 +19,7 @@
     "cordis.patch.yml",
     "skills",
     "README.md",
+    "LICENSE",
     "sop",
     "templates",
     "scripts",
@@ -32,7 +33,7 @@
   "scripts": {
     "build:types": "tsc -b .",
     "build": "tsc -b . && tsdown",
-    "test": "vitest run"
+    "test": "node --experimental-strip-types --test \"tests/*.mjs\""
   },
   "peerDependencies": {
     "@deepseek-ai/cordis": "^4.0.0",

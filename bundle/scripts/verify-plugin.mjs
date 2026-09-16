@@ -292,6 +292,35 @@ function verifyKit() {
     fail('kit: notes/README.md is missing; the layout convention is not documented where it is used')
   }
 
+  // The repository declares MIT in its README, in the bundle it publishes, and in every manifest the
+  // templates render. A declaration with no text behind it is the same class of gap the rest of this gate
+  // exists to catch — and this one is worse than most, because GitHub's license detection reads this exact
+  // path and nothing else: the repository would show no license to everyone except the people who could fix
+  // it, and the published tarball would assert one it does not carry.
+  //
+  // The *content* is checked, not just the existence. A file named `LICENSE` holding some other license
+  // passes an existence check while making the claim worse rather than better — the difference between an
+  // unbacked assertion and a contradicted one. This is a shape check, not legal review: it can tell that the
+  // text is MIT, and cannot tell whether the holder is the right one to grant it.
+  const license = readIfPresent(join(REPO_ROOT, 'LICENSE')) ?? ''
+  const licenseIsMit = /^MIT License$/m.test(license) && license.includes('WITHOUT WARRANTY OF ANY KIND')
+  if (license === '') {
+    fail('kit: LICENSE is missing; the repository declares MIT and ships no license text')
+  } else if (!licenseIsMit) {
+    fail('kit: LICENSE does not read as MIT, but the README and the published manifest both declare MIT')
+  }
+
+  // The declaration and the text live in different files, and only one of them ships. `bundle/package.json`
+  // is in the tarball, so a mismatch here means a published package asserting a license it does not carry —
+  // a contradiction no other check in this repository would see.
+  const bundleManifest = join(REPO_ROOT, 'bundle', 'package.json')
+  const declaredLicense = existsSync(bundleManifest)
+    ? JSON.parse(readFileSync(bundleManifest, 'utf8')).license
+    : undefined
+  if (declaredLicense !== 'MIT') {
+    fail(`kit: bundle/package.json declares ${JSON.stringify(declaredLicense)}; the LICENSE file is MIT`)
+  }
+
   // Relative markdown links must resolve. This was added the moment it was needed: renaming a note left a
   // link pointing at the old name, which nothing else would have caught.
   verifyRelativeLinks(REPO_ROOT)
