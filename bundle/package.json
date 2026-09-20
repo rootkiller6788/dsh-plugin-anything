@@ -2,6 +2,26 @@
   "name": "dsh-plugin-anything-bundle",
   "version": "0.1.0",
   "description": "Model-facing tools that generate, promote, verify, and install DeepSeek Harness plugin bundles for arbitrary targets",
+  "keywords": [
+    "dsh",
+    "deepseek-harness",
+    "cordis",
+    "plugin",
+    "bundle",
+    "agent",
+    "tools",
+    "mcp",
+    "openapi"
+  ],
+  "homepage": "https://github.com/rootkiller6788/dsh-plugin-anything#readme",
+  "bugs": {
+    "url": "https://github.com/rootkiller6788/dsh-plugin-anything/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rootkiller6788/dsh-plugin-anything.git",
+    "directory": "bundle"
+  },
   "type": "module",
   "main": "lib/index.js",
   "types": "lib/types/index.d.ts",
