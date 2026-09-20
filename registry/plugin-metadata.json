@@ -38,6 +38,10 @@
       "purpose": "Write a bundle skeleton from the kit's templates. Existing files are never overwritten; unresolved placeholders become visible TODO markers."
     },
     {
+      "name": "plugin_anything_compile",
+      "purpose": "Compile a Capability IR into plugin source. The backend reads capabilities rather than sources, so the same IR produces the same code whoever wrote it; it reports what it declined."
+    },
+    {
       "name": "plugin_anything_verify",
       "purpose": "Run the kit's static gate over a bundle. Reports a failure rather than a pass when it cannot locate the gate."
     },
@@ -46,13 +50,21 @@
       "purpose": "Install a bundle into a profile and confirm its layer composed, grepping the row id because a patch that matches no row only warns."
     },
     {
+      "name": "plugin_anything_accept",
+      "purpose": "Run the acceptance tail — build, compose, boot, discover, invoke, present, replay — and return one verdict. A stage that could not run yields `incomplete`, never a pass."
+    },
+    {
+      "name": "plugin_anything_package",
+      "purpose": "Produce the distribution artifact and compare it against the manifest's `files`, so a promised entry that is absent is reported rather than shipped."
+    },
+    {
       "name": "plugin_anything_promote",
       "purpose": "Capture a live dynamic cordis package as source on disk so it can be converted into a real bundle. Writes an intermediate artifact, not a finished bundle.",
       "conditional": "Registers only where `dynamicCordisRunner` is mounted — the dsh-web-app bundle provides it; dsh-base does not."
     }
   ],
-  "toolCount": 6,
-  "toolCountWithoutCordisRuntime": 5,
+  "toolCount": 9,
+  "toolCountWithoutCordisRuntime": 8,
   "verified": {
     "note": "What has evidence, and what does not. See docs/runtime-acceptance.md.",
     "against": "dsh 0.1.5-rc.2, in a real profile",
