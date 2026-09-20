@@ -83,6 +83,12 @@ jobs:
       - name: Shipped copies match the kit
         run: node scripts/check-shipped-copies.mjs
 
+      # The other half of the same idea. `check-shipped-copies` pins files that are duplicated by design; this
+      # pins the lists that are written out by hand. Both exist because the drift is invisible: `bundle/README.md`
+      # listed five tools of nine and the registry metadata six of nine, and nothing looked.
+      - name: Documented tool lists match the registrations
+        run: node scripts/check-tool-lists.mjs
+
   typecheck:
     name: Generated code compiles against the real dsh types
     runs-on: ubuntu-latest
