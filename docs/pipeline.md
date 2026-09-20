@@ -1,4 +1,4 @@
-|  |  | `plugin_anything_accept` | implemented ||  |  | `plugin_anything_accept` | implemented ||  |  | `plugin_anything_accept` | implemented ||  |  | `plugin_anything_accept` | implemented ||  |  | `plugin_anything_accept` | implemented ||  |  | `plugin_anything_accept` | implemented ||  |  | `plugin_anything_accept` | implemented |# The pipeline
+# The pipeline
 
 This is the project. Not the tools — the tools are mechanizations of its stages, and arguing about them
 before the pipeline is defined is how a pipeline ends up shaped like whatever got built first.
