@@ -42,24 +42,29 @@ supports the decision; it does not make it.
 | 5 | Plan / map | agent | — | **absent** |
 | 6 | Scaffold | deterministic | `plugin_anything_scaffold` | implemented |
 | 7 | Implement | deterministic | `plugin_anything_compile` | implemented |
-| 8 | Build | deterministic | — | partial |
+| 8 | Build | deterministic | `plugin_anything_accept` | implemented |
 | 9 | Verify | deterministic | `plugin_anything_verify` | implemented |
 | 10 | Install | deterministic | `plugin_anything_install` | implemented |
-| 11 | Compose | deterministic | — | partial |
-| 12 | Boot | deterministic | — | partial |
-| 13 | Discover | runtime | — | **absent** |
-| 14 | Invoke | runtime | — | **absent** |
-| 15 | Present | deterministic | — | partial |
-| 16 | Replay | deterministic | — | partial |
-| 17 | Scan | external | — | external |
+| 11 | Compose | deterministic | `plugin_anything_accept` | implemented |
+| 12 | Boot | deterministic | `plugin_anything_accept` | implemented |
+| 13 | Discover | runtime | `plugin_anything_accept` | implemented |
+| 14 | Invoke | runtime | `plugin_anything_accept` | implemented |
+| 15 | Present | deterministic | `plugin_anything_accept` | implemented |
+| 16 | Replay | deterministic | `plugin_anything_accept` | implemented |
+| 17 | Scan | deterministic | `plugin_anything_package` | implemented |
 | 18 | Promote | runtime | `plugin_anything_promote` | implemented |
 | 19 | Package | deterministic | `plugin_anything_package` | implemented |
 | 20 | Publish | external | — | external |
 
-**Fourteen mechanized. **No stage is owed.** Four owned by judgement. Two owned elsewhere.**
+**Fifteen mechanized. No stage is owed. Three owned by judgement. One judgement with mechanized support.
+One owned elsewhere.**
 
-The seven that exist are coverage, not a tool set — and reading them as "the tool set" is what made an earlier
-draft propose cutting one.
+Nine tools exist. Eight of them cover the fifteen mechanized stages, because §8 and §11–§16 are one decision
+made of seven checks — `accept` spans seven rows — and §17 and §19 are both `package`. The ninth, `inspect`,
+mechanizes no stage: it gathers evidence for §2, which is owned by judgement.
+
+The coverage number is the thing to watch, not the tool count — and reading the tools as "the tool set" is
+what made an earlier draft propose cutting one.
 
 ## Paths are subgraphs
 
@@ -116,13 +121,12 @@ See [`bundle/src/ir.ts`](../bundle/src/ir.ts) for the shape, and
 
 ## What this changes about the tools
 
-Nothing yet — and that is the point. The pipeline is now defined, so a change to the tool set can be
-justified by naming the stage it serves and the coverage it adds. The next work is the stage list above, in
-the order the gaps hurt:
+All three gaps this section once named are now closed: `inspect` gathers the evidence §2 needs, `compile`
+turns the IR into plugin source (§4→§7), and `accept` runs the tail as one verdict (§8–§16).
 
-1. **Inspect (§2)** — nothing downstream can start without evidence, and today the agent re-derives it per run.
-2. **Compile (§4→§7)** — IR in, plugin source out. The IR exists; the backend does not.
-3. **Accept (§11–§16)** — the tail, mechanized as one verdict instead of five manual steps.
+The section is kept because the rule it states is the rule that decides the next change: the pipeline is
+defined, so a tool is justified by naming the stage it serves and the coverage it adds — never by the shape of
+what happened to be built first.
 
 `probe` stays, and gets clarified: its job is §1, classification, not inspection. Those were conflated in the
 earlier draft, which is part of why cutting it looked plausible.
