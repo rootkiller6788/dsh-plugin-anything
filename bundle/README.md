@@ -13,13 +13,19 @@ For local development against a checkout, `add ./bundle` from this repository's 
 
 ## Tools
 
+In pipeline order. A tool that is absent here is a gap a user cannot see.
+
 | Tool | Use it for |
 |---|---|
 | `plugin_anything_probe` | Classify a target as a CLI, an HTTP API, or an MCP server, and gather the evidence that it is actually callable. **Run this first** — an MCP target should not get a plugin at all. |
+| `plugin_anything_inspect` | Collect what a target actually offers, as normalised evidence: version, subcommands with their verbatim help text, top-level flags. It gathers facts and reports what it could not determine — it does not summarise or choose capabilities. |
 | `plugin_anything_scaffold` | Write a bundle skeleton from the kit's templates. Existing files are never overwritten. |
-| `plugin_anything_verify` | Run the kit's static gate over a bundle. |
-| `plugin_anything_install` | Install into a profile and confirm the layer composed. |
-| `plugin_anything_promote` | Freeze a live dynamic cordis package into a bundle on disk. |
+| `plugin_anything_compile` | Compile a Capability IR into plugin source. The backend reads capabilities, not sources, so it produces the same code whoever wrote the IR — and reports what it declined, and why. |
+| `plugin_anything_verify` | Run the kit's static gate over a bundle. Catches what is otherwise silent: a patch the gate never discovers, a row that matches nothing, an entry the Loader discards, an impure presenter. A pass is not proof the plugin boots. |
+| `plugin_anything_install` | Install a bundle into a profile and prove the layer composed. The dump is inspected rather than trusted, because a misspelled patch row id produces only a warning. |
+| `plugin_anything_accept` | Run the acceptance tail — build, compose, boot, discover, invoke, present, replay — and return **one verdict**. Each stage catches what the last one cannot, and a stage that could not run yields `incomplete`, never a pass. |
+| `plugin_anything_package` | Produce the distribution artifact and check it carries what the manifest promises. A `files` list that has drifted from what the code reads works locally and fails for every user. |
+| `plugin_anything_promote` | Freeze a live dynamic cordis package into source on disk. It writes an intermediate artifact, not a finished bundle. |
 
 `plugin_anything_promote` registers **only where the cordis runtime is mounted**. `cordis-host-runner` lives
 in the `dsh-web-app` bundle and is absent from `dsh-base`, so a headless profile has no dynamic packages for
