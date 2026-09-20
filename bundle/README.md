@@ -40,15 +40,21 @@ Every field has a default; state only what you override.
 - id: plugin-anything
   name: 'dsh-plugin-anything-bundle'
   config:
-    verifierPath: '/abs/path/to/kit/scripts/verify-plugin.mjs'
+    # Optional. Defaults to the gate this package ships; set it to use another copy.
+    verifierPath: ''
     outputDir: !!js dshHomePath('plugin-anything')
     profile: 'dev'
     timeoutMs: 120000
 ```
 
-`verifierPath` is empty by default, in which case the verify tool falls back to the sibling
-`kit/` directory. A separately-installed bundle must set it — and if neither path
-resolves, the tool **reports the failure** rather than reporting a pass it did not perform.
+`verifierPath` is empty by default, and the verify tool then runs the copy **this package ships** at
+`scripts/verify-plugin.mjs`. An installed bundle therefore needs no configuration to verify — an earlier
+revision defaulted to a sibling `kit/` directory, which resolves only inside this repository, so for anyone
+who installed from a tarball the gate could never be found and `verify` could never pass.
+
+Point `verifierPath` at the kit's original only when working in a checkout and you want the gate as the kit
+holds it; the two copies are kept identical by `scripts/check-shipped-copies.mjs`. Whichever path is in play,
+one that does not resolve is **reported as a failure**, never as a pass the tool did not perform.
 
 ## What this bundle does not do
 
