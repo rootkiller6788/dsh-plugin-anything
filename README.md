@@ -27,6 +27,9 @@
   <img src="https://img.shields.io/badge/TypeScript-6-3178C6?style=flat" alt="TypeScript 6">
 </p>
 
+**One command**: `dsh plugin --profile <profile> add dsh-plugin-anything-bundle` — install, restart, and call
+the tools. Surviving the restart is the whole point; it is what a dynamic package cannot do.
+
 ---
 
 ## Golden E2E
