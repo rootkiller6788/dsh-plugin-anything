@@ -1,4 +1,4 @@
-<h1 align="center"><img src="assets/logo.png" alt="" width="64" style="vertical-align: middle;">&nbsp; dsh-plugin-anything: Making ALL Software DSH-Native</h1>
+<h1 align="center"><img src="assets/icon.png" alt="" width="64" style="vertical-align: middle;">&nbsp; dsh-plugin-anything: Making ALL Software DSH-Native</h1>
 
 <p align="center">
   <img src="assets/overview.png" alt="Overview of the project: the compiler (frontends into a Capability IR, then out to a plugin bundle), the twenty-stage pipeline with each stage's owner, the acceptance verdict table, and the runtime call chain">
