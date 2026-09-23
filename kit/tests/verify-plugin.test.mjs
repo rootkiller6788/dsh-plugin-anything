@@ -1,9 +1,14 @@
 /**
  * Acceptance tests for `scripts/verify-plugin.mjs`.
  *
- * Every check the verifier implements is exercised twice: once against a plugin that should pass, and
- * once against a single-field mutant that should fail with a specific message. A gate that has never
- * been observed rejecting anything is not evidence.
+ * Every rejection branch `verifyPlugin` can take is exercised here against a single-field mutant of the
+ * baseline bundle, and the mutant's own message is asserted — a branch reached by accident, or reported
+ * under the wrong text, is not evidence. A gate that has never been observed rejecting anything is not
+ * evidence at all.
+ *
+ * Scope: `verifyPlugin` only, i.e. the no-flag rung. The `--kit` rung checks this repository's own
+ * structure rather than a plugin's, and is exercised by running it against the repository — `verifyKit`
+ * has no mutants here.
  *
  * Runs on `node --test` with no dependencies.
  */
@@ -91,6 +96,24 @@ test('rejects a patch file whose name does not contain "cordis"', () => {
     const { status, stderr } = run(dir)
     assert.equal(status, 1)
     assert.match(stderr, /must contain "cordis"/)
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('rejects a bundle with no package.json', () => {
+  const dir = fixture({ 'package.json': null })
+  try {
+    const { status, stderr } = run(dir)
+    assert.equal(status, 1)
+    assert.match(stderr, /missing .*package\.json/)
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('rejects a package.json that is not JSON', () => {
+  const dir = fixture({ 'package.json': '{ "name": "dsh-plugin-widget",\n' })
+  try {
+    const { status, stderr } = run(dir)
+    assert.equal(status, 1)
+    assert.match(stderr, /package\.json is not valid JSON/)
   } finally { rmSync(dir, { recursive: true, force: true }) }
 })
 
@@ -191,6 +214,37 @@ test('accepts a bare row name that IS declared in dependencies', () => {
   } finally { rmSync(dir, { recursive: true, force: true }) }
 })
 
+test('rejects a dsh.bundle.patch that points at a file which does not exist', () => {
+  // The declaration is present and named correctly; only the file is absent. Deleting it is the one
+  // mutation that reaches this branch, since every earlier check passes on the declared path.
+  const dir = fixture({ 'cordis.patch.yml': null })
+  try {
+    const { status, stderr } = run(dir)
+    assert.equal(status, 1)
+    // The message reports the declared path verbatim, `./` included.
+    assert.match(stderr, /dsh\.bundle\.patch points at \.\/cordis\.patch\.yml, which does not exist/)
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('rejects a patch that files[] does not list', () => {
+  // A patch the manifest does not ship: it works in the working tree and is missing from the tarball.
+  const dir = fixture({
+    'package.json': JSON.stringify({
+      name: 'dsh-plugin-widget',
+      version: '0.1.0',
+      type: 'module',
+      main: 'index.js',
+      files: ['index.js'],
+      dsh: { bundle: { patch: './cordis.patch.yml' } },
+    }, undefined, 2),
+  })
+  try {
+    const { status, stderr } = run(dir)
+    assert.equal(status, 1)
+    assert.match(stderr, /files\[\] does not include "cordis\.patch\.yml"/)
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
 test('rejects a function plugin that also has a default export', () => {
   const dir = fixture({
     'index.js': "export const name = 'widget'\nexport function apply() {}\nexport default { name: 'widget' }\n",
@@ -199,6 +253,25 @@ test('rejects a function plugin that also has a default export', () => {
     const { status, stderr } = run(dir)
     assert.equal(status, 1)
     assert.match(stderr, /discards the function plugin's namespace/)
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('rejects a bundle with no plugin entry at all', () => {
+  const dir = fixture({ 'index.js': null })
+  try {
+    const { status, stderr } = run(dir)
+    assert.equal(status, 1)
+    assert.match(stderr, /no plugin entry found/)
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('rejects an entry that exports apply but not name', () => {
+  // The Loader needs `name` for diagnostics; a plugin with only `apply` loads and is then unnameable.
+  const dir = fixture({ 'index.js': 'export function apply() {}\n' })
+  try {
+    const { status, stderr } = run(dir)
+    assert.equal(status, 1)
+    assert.match(stderr, /exports apply but not name/)
   } finally { rmSync(dir, { recursive: true, force: true }) }
 })
 

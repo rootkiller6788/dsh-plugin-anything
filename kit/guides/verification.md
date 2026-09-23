@@ -28,9 +28,10 @@ What it checks, and why each one matters:
 | A function plugin has no default export and does export `name` | Mixing the forms makes the Loader discard the function plugin's namespace. |
 | Presenters are pure | Presenters also run on replay; a clock read or an I/O call inside one makes replays nondeterministic. |
 
-The verifier is itself tested: `node --test tests/verify-plugin.test.mjs` runs every check against a
-single-field mutant that must fail. **A check that has never been observed rejecting anything is not
-evidence.**
+The verifier is itself tested: `node --test tests/verify-plugin.test.mjs` runs each of the fifteen
+rejections `verifyPlugin` can produce against a single-field mutant that must fail, asserting the message
+that mutant is supposed to produce. **A check that has never been observed rejecting anything is not
+evidence.** The `--kit` rung is not covered by those mutants; it is exercised by running it here.
 
 The purity check is a static approximation: it inspects `presentCall(...)` / `presentResult(...)` method
 bodies for `Date.now`, `Math.random`, fs calls, `fetch(`, `process.env`, and `new Date(`. A presenter that

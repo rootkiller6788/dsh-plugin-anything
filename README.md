@@ -254,7 +254,9 @@ A patch file whose name does not contain `cordis`; a missing `dsh.bundle.patch`;
 `files`; a comments-only patch (it throws at boot); `!!js` outside `config`/`disabled`; an undeclared bare
 plugin name in a row; a function plugin with a `default` export; an impure presenter — each is rejected.
 
-The gate is itself tested against single-field mutants, so every check has been observed rejecting something.
+The gate is itself tested against single-field mutants: all fifteen rejections the plugin verifier can
+produce have a test that observes one fire and asserts its message. The `--kit` rung checks this repository
+instead of a plugin and has no mutant tests.
 
 ## Status
 
