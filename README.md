@@ -82,7 +82,8 @@ the full map.
 
 [DeepSeek Harness](https://github.com/deepseek-ai/deepseek-harness) (`dsh`) is built on vendored Cordis,
 where **everything is a plugin**: the model adapter, the tool registry, the session log, and the agent loop
-itself. There is no privileged core, and every part is replaceable from `cordis.yml`.
+itself. There is no privileged core, and every part is replaceable from `cordis.patch.yml` — the user's
+own layer, applied after every bundle layer.
 
 `dsh-plugin-anything` is the missing on-ramp to that architecture. Given any operable target — an external
 CLI, an HTTP/REST API, a local service — it produces an installable **plugin bundle** that a `dsh` agent can

@@ -31,7 +31,7 @@ This command implements HARNESS.md Phases 0–7 to produce one dsh plugin packag
 - **Prove it is callable.** Run it. Record the literal invocation and its observed output. An assumed surface is not an acquired one.
 - Derive the plugin name from the target: lowercase kebab, `dsh-plugin-<target>`.
 
-**Stop condition.** If the target is already an MCP server, **generate nothing**. `dsh` already bridges MCP servers — `packages/mcp/mcp-client` runs one plugin instance per server and their tools arrive as ordinary `ctx.tools` entries named `mcp__<serverName>__<rawName>`. Tell the user to add an opt-in `@deepseek-ai/dsh-mcp-client` row to their `cordis.yml` instead. See [`../guides/backend-mcp.md`](../guides/backend-mcp.md).
+**Stop condition.** If the target is already an MCP server, **generate nothing**. `dsh` already bridges MCP servers — `packages/mcp/mcp-client` runs one plugin instance per server and their tools arrive as ordinary `ctx.tools` entries named `mcp__<serverName>__<rawName>`. Tell the user to add an opt-in `@deepseek-ai/dsh-mcp-client` row to their `cordis.patch.yml` instead — **not** `cordis.yml`, which dsh rewrites on every boot, discarding the row silently. See [`../guides/backend-mcp.md`](../guides/backend-mcp.md).
 
 ### Phase 1 — Capability surface analysis
 
@@ -43,7 +43,7 @@ This command implements HARNESS.md Phases 0–7 to produce one dsh plugin packag
 ### Phase 2 — Plugin architecture design
 
 - Choose the **form**. A **function plugin** — named exports `name`, `inject`, `Config`, `apply`, and **no default export** — is the default for tool plugins. A **service plugin** (`export default class X extends Service`) is for when you contribute a service others consume. **These must not be mixed**; mixing makes the Loader discard the function plugin's namespace.
-- Declare `Config` with `@deepseek-ai/schemastery` and give **every field a default**, then narrow once inside `apply` with `config as Required<Config>`. Validate the values that would otherwise fail silently — misconfiguration must fail loud. Any value a deployment could reasonably vary is a validated `Config` field changeable from `cordis.yml`; a `DEFAULT_*` constant is not configurability.
+- Declare `Config` with `@deepseek-ai/schemastery` and give **every field a default**, then narrow once inside `apply` with `config as Required<Config>`. Validate the values that would otherwise fail silently — misconfiguration must fail loud. Any value a deployment could reasonably vary is a validated `Config` field changeable from `cordis.patch.yml`; a `DEFAULT_*` constant is not configurability.
 - Design the `cordis.patch.yml` rows, respecting every rule listed below.
 - Decide the skill. There is no skill-packaging mechanism in a bundle: if the plugin needs teaching, it ships `skills/<name>/SKILL.md` **and** mounts its own discovery row. Never assume the host provides skill discovery. See [`../guides/skill-authoring.md`](../guides/skill-authoring.md).
 

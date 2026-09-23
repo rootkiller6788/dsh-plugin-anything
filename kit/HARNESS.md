@@ -90,7 +90,10 @@ If the target exposes an MCP endpoint, **do not generate a plugin**. `dsh` alrea
 `packages/mcp/mcp-client` runs one plugin instance per server, and their tools arrive as ordinary
 `ctx.tools` entries under native names `mcp__<serverName>__<rawName>`.
 
-Tell the user to add an opt-in row to their `cordis.yml` instead:
+Tell the user to add an opt-in row to their `cordis.patch.yml` instead — **not** `cordis.yml`. That file
+is the profile's include root and `prepareProfile` rewrites it on every boot
+(`apps/cli/src/profile-boot.ts`); the text it writes there says *"Edit cordis.patch.yml, not this file."*
+A row added to it is gone by the next boot, and gone silently:
 
 ```yaml
 - id: mcp-<serverName>
@@ -177,7 +180,7 @@ Validate the values that would fail silently. `packages/fs/tool-fs/src/index.ts`
 `assertPositiveInteger` helper, because a non-positive integer would make window arithmetic misbehave
 without erroring. **Misconfiguration fails loud.**
 
-Any value a deployment could reasonably vary is a validated `Config` field changeable from `cordis.yml`.
+Any value a deployment could reasonably vary is a validated `Config` field changeable from `cordis.patch.yml`.
 A `DEFAULT_*` constant or a test hook is not configurability.
 
 ### Design the patch rows
