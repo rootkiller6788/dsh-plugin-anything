@@ -22,16 +22,18 @@ being whatever got built first.
 **Define the pipeline first, as data, and compute coverage from it.** `bundle/src/pipeline.ts` carries
 twenty stages, each with an `owner` (`agent` / `deterministic` / `runtime` / `external`) and a `rationale`
 naming why that owner; five named paths through it for different inputs; and an `ACCEPTANCE_TAIL` every
-non-terminal path must end in. `coverage()` returns four mutually exclusive groups, and `tests/ir.test.mjs`
+non-terminal path must end in. `coverage()` returns five mutually exclusive groups, and `tests/ir.test.mjs`
 asserts they partition the stages by id.
 
 The tool question then answers itself: a stage whose owner is `deterministic` or `runtime` and which has no
 tool is **owed**. An `agent` stage with no tool is correct — that is the design, and mechanizing it replaces
 judgement with a heuristic that will be wrong on the target nobody anticipated.
 
-Result: **14 stages owed, 14 mechanized, 8 tools.** The tools do not correspond one-to-one with stages
-because `accept` mechanizes seven of them as a single verdict; the coverage number is the thing to watch,
-not the tool count.
+Result at the time: **14 stages owed, 14 mechanized, 8 tools** — `inspect`, `compile`, and `accept` were
+still the work. What `coverage()` reports now is **0 owed, 15 mechanized, 9 tools**: every stage that can
+be mechanized has been, and the four that are not are judgement by design. The tools do not correspond
+one-to-one with stages because `accept` mechanizes seven of them as a single verdict; the coverage number
+is the thing to watch, not the tool count.
 
 ## Alternatives considered
 
@@ -42,8 +44,11 @@ not the tool count.
 - **Mechanize the agent stages too** — generate capabilities from a target without a reader. Rejected: this
   is the whole reason the project is not a code generator. Inspection gathers evidence; deciding what
   matters is the judgement that the pipeline exists to preserve.
-- **Treat `scan` and `publish` as gaps.** Rejected: both have owners outside this project, and naming them
-  as `external` is what stops them being forgotten rather than what fills them.
+- **Treat `scan` and `publish` as gaps.** Rejected at the time on the grounds that both had owners outside
+  this project, and naming them as `external` is what stops them being forgotten rather than what fills
+  them. `publish` ended there. `scan` did not: the supply-chain surface turned out to be small and
+  checkable, so it is `deterministic` and folds into `plugin_anything_package` — a check nobody is asked to
+  run being the same as no check.
 
 ## Consequences
 
@@ -61,4 +66,4 @@ not the tool count.
 - **The pipeline is now the thing a change is justified against.** A tool is added, removed, or merged by
   naming the stage it serves and the coverage it changes. That is a conversation with a computable answer.
 - What remains unmechanized is unmechanized on purpose: three agent stages with no tool, one with a tool
-  that gathers evidence, and two stages owned elsewhere.
+  that gathers evidence, and one stage owned elsewhere.

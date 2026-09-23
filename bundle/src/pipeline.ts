@@ -354,14 +354,14 @@ export function stage(id: string): Stage | undefined {
 }
 
 /**
- * Report where the pipeline stands, as four mutually exclusive groups.
+ * Report where the pipeline stands, as five mutually exclusive groups.
  *
  * The groups **partition** the stages: every stage is in exactly one. That is not cosmetic — an earlier
  * version put every `agent` stage in one group and every tooled stage in another, so a stage that was both
  * (inspect: agent-owned, with a tool that gathers its evidence) was counted twice and the totals did not
  * add up. A report whose numbers do not add up is a report nobody checks.
  *
- * @returns the four groups. `owed` is the work; `supported` is the judgement this tooling actually helps.
+ * @returns the five groups. `owed` is the work; `supported` is the judgement this tooling actually helps.
  */
 export function coverage(): {
   /** Deterministic or runtime stages *with* a tool: mechanized. */
