@@ -134,9 +134,9 @@ dsh-plugin-anything/
 │   └── tests/                       #   the gate's own acceptance tests
 │
 ├── bundle/                          # the npm package: the plugin_anything_* tools
-│   ├── src/                         #   tools.ts, pipeline.ts, ir.ts, compile.ts, inspect.ts, accept.ts, pack.ts
+│   ├── src/                         #   tools.ts, pipeline.ts, ir.ts, compile.ts, accept.ts, … — 14 modules
 │   ├── tests/                       #   141 tests over the whole surface
-│   ├── scripts/                     #   accept-bundle.mjs, package-bundle.mjs, typecheck-example.mjs, render-example.mjs
+│   ├── scripts/                     #   verify-plugin.mjs, plus the accept/package/render/typecheck harnesses
 │   ├── templates/ sop/ skills/ docs/  #  shipped copies of what the tools read at runtime
 │   └── cordis.patch.yml             #   the bundle's patch layer
 │
@@ -146,7 +146,7 @@ dsh-plugin-anything/
 │
 ├── registry/                        # the awesome-dsh-plugin entry, and the metadata that format lacks
 ├── notes/                           # Agent Notes — the decisions, and what was rejected
-├── scripts/                         # the acceptance ladder, the golden E2E, three consistency checks
+├── scripts/                         # the acceptance ladder, the golden E2E, four consistency checks
 ├── docs/                            # pipeline.md, runtime-acceptance.md, and the archived plan
 └── .github/workflows/               # CI: gates, golden E2E, composition against a real dsh
 ```
