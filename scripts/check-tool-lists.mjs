@@ -16,8 +16,10 @@
  *
  * **Two documents are deliberately excluded, and adding them here would be wrong:**
  *
- *   - `bundle/skills/**\/SKILL.md` names only `verify` and `promote`, because it instructs the agent on the
- *     two steps that *must* go through a tool. Naming the other seven would be noise in a procedure.
+ *   - `bundle/skills/**\/SKILL.md` is a procedure, not a list. It gives a section to the tools a run *must*
+ *     call — `verify` after every edit, `promote` to freeze a live dynamic package — and mentions the rest
+ *     only in passing, where a step happens to reach for one. Comparing it to the registrations would
+ *     demand it document tools it has no reason to name.
  *   - `kit/HARNESS.md` and `kit/guides/**` are the manual SOP. They name a tool where the manual path
  *     reaches one, which is incidental rather than a list.
  *

@@ -155,8 +155,10 @@ jobs:
       - name: Acceptance ladder
         run: node scripts/acceptance.mjs
         env:
-          # No profile exists in CI, so rungs 6–7 report SKIPPED rather than failing. The composition and
-          # boot rungs are covered by the `composition` job below, against a real dsh.
+          # No profile exists in CI, so the composition and boot rungs report SKIPPED rather than failing.
+          # They are numbers 7 and 8 — `acceptance.mjs` prints `• 7-8 composition + boot gate: SKIPPED` —
+          # and they are covered by the `composition` job below, against a real dsh. The rung numbers are
+          # named there rather than here so this comment cannot be the stale copy.
           DSH_HOME: ${{ github.workspace }}/.dsh-home
 
   registry:
