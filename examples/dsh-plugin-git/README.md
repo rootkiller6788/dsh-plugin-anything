@@ -23,7 +23,19 @@ dsh --profile <profile> --dump-config | grep -A3 '# == dsh-plugin-git'
 
 ## Verify
 
+The kit's static gate is not part of this bundle — copying it in would be a second copy to keep in step
+with the kit's own. Run it from the kit that generated this bundle, or through the toolset, which runs
+the same gate:
+
 ```sh
-node scripts/verify-plugin.mjs .
-node --test tests/
+node <path-to-kit>/scripts/verify-plugin.mjs .
+# or, with plugin_anything installed:
+#   plugin_anything_verify({ path: '.' })
+```
+
+Then this bundle's own tests. `test` is this package's script, so the runner is whatever
+`package.json` names rather than a second command written out here:
+
+```sh
+pnpm test
 ```
