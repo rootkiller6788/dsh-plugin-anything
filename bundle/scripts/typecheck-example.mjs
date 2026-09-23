@@ -19,7 +19,7 @@ import { mkdtempSync, mkdirSync, writeFileSync, rmSync, existsSync } from 'node:
 import { dirname, join, resolve } from 'node:path'
 import { spawnSync } from 'node:child_process'
 import { fileURLToPath } from 'node:url'
-import { renderBundle } from '../src/scaffold.ts'
+import { DEFAULT_DSH_RANGE, renderBundle } from '../src/scaffold.ts'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const BUNDLE = resolve(HERE, '..')
@@ -33,7 +33,7 @@ const SPEC = {
   target: 'git',
   description: 'Inspect a git repository: status, history, and diffs.',
   executable: 'git',
-  dshRange: '^0.1.5-rc.2',
+  dshRange: DEFAULT_DSH_RANGE,
   tools: [
     { name: 'git_status', description: 'Show the working tree status of a repository.', subcommand: 'status' },
     { name: 'git_log', description: 'List recent commits from a repository.', subcommand: 'log' },
@@ -207,7 +207,7 @@ try {
       target: PROBE_IR.target.name,
       description: PROBE_IR.target.description,
       executable: PROBE_IR.capabilities[0].invocation.command,
-      dshRange: '^0.1.5-rc.2',
+      dshRange: DEFAULT_DSH_RANGE,
       tools: PROBE_IR.capabilities.map((c) => ({ name: c.id, description: c.description, subcommand: '' })),
     }))
     process.stdout.write(`typechecking a compiled bundle at ${irRoot}\n`)
