@@ -14,8 +14,8 @@
      → 错。那是 smart-plugin-market 的 **probe 产物**，不是投稿格式。
        真实投稿格式是 awesome-dsh-plugin 的 data/plugins/<owner>__<repo>.yml，
        必填 url/name/category/description.en，分类取自 CAT_IDS 的 14 项。
-       更正见：dsh-plugin-anything-plugin/guides/registry-entry.md
-               dsh-plugin-anything-plugin/HARNESS.md §10
+       更正见：kit/guides/registry-entry.md
+               kit/HARNESS.md §10
                notes/implemented/architecture/2026-09-16-reuse-the-existing-plugin-market.md
 
   2. §1.10 与 §五-5  “（含 CLI-Anything 已产出的 cli-anything-* Python CLI，两个仓库由此串联）”
@@ -23,11 +23,17 @@
      → 错。CLI-Anything 在本项目中是**设计参考**（同构映射的对象），不是运行时依赖，
        也不是集成目标。验证项 5 已作废：换成 git/ffmpeg/jq 任一非平凡 CLI，验证到的
        东西完全相同，它不检验本项目的任何特有性质。
-       边界说明见：dsh-plugin-anything-plugin/HARNESS.md §1
+       边界说明见：kit/HARNESS.md §1
 
   3. §二-354  guides/render-intent.md   → 未建；render intent 并入 guides/tool-contract.md
      §二-359  scripts/verify-plugin.sh   → 实为 verify-plugin.mjs（JS 生态，不用 bash）
      §六-440  同上
+
+  4. §二 的仓库结构树把 SOP 工具包写作 `dsh-plugin-anything-plugin/`。
+     → 过时。那是立项时的目录名，后更名为 `kit/`，同一棵树里的
+       `guides/`、`commands/`、`templates/`、`scripts/verify-plugin.mjs` 则沿用至今。
+       正文按原样保留；本头部各条更正中的路径已写成 `kit/`，否则「更正」指向一个
+       不存在的目录，读者会以为整棵树都作废。
 
 另有一处值得记录：§1.5 引用的 skill 挂载写法 `new URL('skills/', baseUrl)` 在 agent
 preset 中正确，但在 **bundle patch 中会静默失效** —— baseUrl 由 app-boot 设为
