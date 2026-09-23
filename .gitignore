@@ -12,3 +12,10 @@ tsconfig.tsbuildinfo
 # A byproduct of running the promote E2E by hand. No script regenerates it, and committing an artifact
 # nothing can reproduce is the drift class the rest of this repository spends its gates preventing.
 .acceptance/
+
+# `golden-e2e.mjs` renders each category into `mkdtempSync(join(BUNDLE, ...))`, so it is inside the tree and
+# shows up in `git status` as untracked while it runs. The script removes it in a `finally`, which covers
+# every failure it can catch and none it cannot: `SIGINT` and `SIGKILL` skip `finally` entirely, so an
+# interrupted run leaves a full rendered bundle behind. Ignored rather than relocated because the render has
+# to sit under `bundle/` for `node_modules` to resolve, which is what the typecheck rung depends on.
+.golden-*
