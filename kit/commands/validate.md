@@ -100,7 +100,7 @@ Audit a generated dsh plugin bundle against HARNESS.md.
 - an HMR-safety test disposes the contributing fiber and asserts cleanup
 - `node scripts/verify-plugin.mjs <plugin-dir>` exits 0 (the script is at [`../scripts/verify-plugin.mjs`](../scripts/verify-plugin.mjs))
 - `README.md` documents the target's prerequisites and the literal install and verify commands
-- `SKILL.md` opens with an exact `---` fence, has a kebab-case `name` and a non-empty `description`, and is emitted at both the repo-root canonical path and the packaged compatibility path
+- `SKILL.md` opens with an exact `---` fence, has a kebab-case `name` and a non-empty `description`, and is emitted inside the package at `skills/<name>/SKILL.md` — **one** copy, not mirrored to a repo root, which §9 reserves for a repository that is itself a skill-distribution point
 
 ## Negative Cases
 

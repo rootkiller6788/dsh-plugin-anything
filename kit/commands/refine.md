@@ -74,7 +74,7 @@ For each agreed gap:
 
 - `README.md` — the new tools, with the literal commands to install and verify.
 - `tests/TEST.md` — append the new plan entries and the fresh results.
-- `skills/dsh-plugin-<target>/SKILL.md` **and** the packaged compatibility copy — keep them in step; a skill that documents tools that no longer match the code is worse than none.
+- `skills/dsh-plugin-<target>/SKILL.md` — the single copy, inside the package; a skill that documents tools that no longer match the code is worse than none.
 - Re-run the verifier: `node scripts/verify-plugin.mjs <plugin-path>` (the script is at [`../scripts/verify-plugin.mjs`](../scripts/verify-plugin.mjs)).
 
 ## Example
@@ -96,7 +96,7 @@ For each agreed gap:
 - New tools follow the same architectural patterns as the originals, per HARNESS.md.
 - The new keyless snapshot was produced by really running the tool.
 - `node scripts/verify-plugin.mjs <plugin-path>` exits 0, and `dsh --profile <p> --dump-config` still shows every patch row id.
-- Both SKILL.md copies and `README.md` describe the plugin as it now is.
+- `SKILL.md` and `README.md` describe the plugin as it now is.
 
 ## Notes
 

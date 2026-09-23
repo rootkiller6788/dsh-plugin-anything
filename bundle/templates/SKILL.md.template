@@ -41,8 +41,8 @@ Frontmatter rules, verified against packages/skill/skill-filesystem/src/index.ts
   Recursive `**/SKILL.md` is NOT supported.
 - Invalid frontmatter is logged and skipped, never fatal.
 
-Emit this file in BOTH places, mirroring the dual-copy convention:
-  1. `skills/dsh-plugin-{{TARGET}}/SKILL.md` at repo root (the canonical copy).
-  2. `skills/dsh-plugin-{{TARGET}}/SKILL.md` inside the plugin package (the packaged copy that ships
-     in `files` and is mounted by the patch's skill-filesystem row).
+Emit this file ONCE, at `skills/dsh-plugin-{{TARGET}}/SKILL.md` inside the plugin package — the copy
+that ships in `files` and is mounted by the patch's skill-filesystem row. Do not also mirror it to a
+repo-root `skills/`: HARNESS.md §9 gives that convention to a repository that is itself a skill
+distribution point, and a generated bundle is not one. A second copy is a second file to keep in step.
 -->

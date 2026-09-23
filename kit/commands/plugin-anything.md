@@ -96,7 +96,7 @@ Run the suites, then append the actual output to `tests/TEST.md` alongside the p
 
 Emit frontmatter that opens with a line that is **exactly** `---` and closes with another, no BOM and no leading blank line. Required: `name` matching `/^[a-z0-9]+(?:-[a-z0-9]+)*$/` and a non-empty `description`. Legacy camelCase keys (`disableModelInvocation`, `modelInvocable`, `userInvocable`) **throw**. Recursive `**/SKILL.md` is unsupported.
 
-Emit it in both places: the canonical `skills/dsh-plugin-<target>/SKILL.md` at repo root, and the packaged compatibility copy inside the plugin at `skills/<name>/SKILL.md`.
+Ship it **inside the plugin package**, at `skills/dsh-plugin-<target>/SKILL.md` — listed in `files` and mounted by a `skill-filesystem` row. Do **not** also mirror it to a repo-root `skills/`: §9 gives that convention to repositories that are themselves skill-distribution points, and a generated bundle is not one. A second copy is a second file to keep in step, and the reference bundle omits it rather than carry a directory nothing reads.
 
 ### Phase 7 — Bundle distribution
 
@@ -163,13 +163,9 @@ dsh-plugin-<target>/
     └── snapshot/          # the keyless runnable-example transcript
 ```
 
-Canonical repo-root skill output:
-
-```
-skills/
-└── dsh-plugin-<target>/
-    └── SKILL.md
-```
+There is no second tree. The skill is the one file above, inside the package, and a
+repo-root `skills/` is not part of the output — see §9 for why a generated bundle does
+not mirror it.
 
 ## Example
 
@@ -199,4 +195,4 @@ The command succeeds when:
 9. `dsh --profile <p> --dump-config` shows both the `# == dsh-plugin-<target>` layer and every row id from the patch.
 10. The tools are visible and callable, and still are after a restart.
 11. `tests/TEST.md` holds both the plan and the appended results; `README.md` documents prerequisites and the literal install/verify commands.
-12. `SKILL.md` is emitted at both the repo-root canonical path and the packaged compatibility path.
+12. `SKILL.md` is emitted inside the plugin package at `skills/dsh-plugin-<target>/SKILL.md`, listed in `files` and mounted — and nowhere else.

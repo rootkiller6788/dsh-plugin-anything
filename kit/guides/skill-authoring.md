@@ -108,10 +108,11 @@ The skill must be in `files`, or the published tarball omits it:
 "files": ["lib/index.js", "lib/types/**/*.d.ts", "cordis.patch.yml", "skills", "README.md"]
 ```
 
-Emit the skill in **both** places, mirroring the dual-copy convention used by the sibling project:
-
-1. `skills/dsh-plugin-<target>/SKILL.md` at repo root — the canonical, human-readable copy.
-2. `skills/dsh-plugin-<target>/SKILL.md` inside the plugin package — the copy that ships and is mounted.
+Emit the skill **once**, inside the plugin package, at `skills/dsh-plugin-<target>/SKILL.md` — the copy
+that ships and is mounted. CLI-Anything also mirrors its skill to a repo-root `skills/` so its own
+`npx skills add` distribution can find it; §9 gives that convention to repositories that are themselves
+skill-distribution points, and a generated bundle is not one. Mirroring it here would be a second file to
+keep in step with the packaged copy.
 
 ## No in-repo precedent
 
