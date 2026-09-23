@@ -7,12 +7,15 @@
     - id: plugin-anything
       name: 'dsh-plugin-anything-bundle'
       # config:
-      #   # Path to the kit's static gate. Defaults to the `kit` directory
-      #   # resolved from this package, and the verify tool reports plainly when it cannot find it.
-      #   verifierPath: '/abs/path/to/kit/scripts/verify-plugin.mjs'
-      #   # Root under which plugin_anything_scaffold writes new bundles.
-      #   outputDir: !!js dshHomePath('plugin-anything')
-      #   # Where `dsh plugin` runs. Defaults to the current profile's name.
+      #   # Empty by default, and the verify tool then runs the copy THIS PACKAGE ships at
+      #   # scripts/verify-plugin.mjs, so an installed bundle needs no configuration to verify. A path
+      #   # here must resolve — one that does not is reported as a failure, never as a pass.
+      #   verifierPath: ''
+      #   # Root under which plugin_anything_scaffold writes new bundles. Empty by default, resolved as
+      #   # <cwd>/plugin-anything. `!!js dshHomePath('plugin-anything')` is a valid override, not the default.
+      #   outputDir: ''
+      #   # The profile `dsh plugin` runs against. Defaults to the literal 'dev', not to whichever profile
+      #   # happens to be invoking.
       #   profile: 'dev'
 
 # ── Ship this bundle's own skill ────────────────────────────────────────────────────────────────────

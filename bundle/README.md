@@ -42,7 +42,10 @@ Every field has a default; state only what you override.
   config:
     # Optional. Defaults to the gate this package ships; set it to use another copy.
     verifierPath: ''
-    outputDir: !!js dshHomePath('plugin-anything')
+    # Empty by default, resolved as <cwd>/plugin-anything. `!!js dshHomePath('plugin-anything')` is a
+    # valid override, shown here because a profile directory is usually where you want the output.
+    outputDir: ''
+    # The literal default, not whichever profile is invoking.
     profile: 'dev'
     timeoutMs: 120000
 ```
