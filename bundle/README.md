@@ -68,15 +68,22 @@ patch. That is `plugin_anything_scaffold`'s job, so the template story keeps a s
 ## Development
 
 ```sh
-# Pure logic — runs without @deepseek-ai/* installed, because nothing under test imports it.
-node --experimental-strip-types --test tests/scaffold.test.mjs
+# The whole suite — `tests/`, 141 tests. Three files import the built entry and fail with a pointer
+# rather than skipping, so this needs `npm run build` first.
+npm test
 
-# Render from the real templates and run the real gate over the result.
+# The two subsets that need no build at all, because nothing they import touches @deepseek-ai/*:
+#   pure logic
+node --experimental-strip-types --test tests/scaffold.test.mjs
+#   render from the real templates and run the real gate over the result
 node --experimental-strip-types --test tests/pipeline.test.mjs
 
 # Render the committed example.
 node --experimental-strip-types scripts/render-example.mjs git
 ```
+
+`npm test` is the command the repository's own "141 tests" figure comes from, so the two are the same
+suite rather than two counts that can drift apart.
 
 `src/backend.ts` is the **only** module here that touches the filesystem or spawns a process. That is the
 same rule this project enforces on the bundles it generates (`HARNESS.md` rule 1), applied to itself.
