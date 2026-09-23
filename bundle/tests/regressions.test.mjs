@@ -225,6 +225,42 @@ test('runCommand refuses to find a command that does not exist, rather than hang
   )
 })
 
+// ── Defect: a timeout threw, so a killed command could not be reported as a result ───────────────────
+//
+// `CommandOutcome.exitCode` was documented `number | null` — "null when the process was killed by a signal"
+// — and the catch threw on *every* non-numeric code, so `null` was unreachable by construction and a
+// timeout arrived as an exception. That contradicted the interface's own opening line, "a non-zero exit is
+// data here, not an exception", and bypassed the verify tool's deliberate design: its `presentResult` says
+// "a failed verification is a successful call that reported a failure, so `isError` is false".
+//
+// Measured before the fix, the three shapes were: non-zero exit `code: 3`; spawn failure `code: 'ENOENT'`;
+// timeout `{ code: null, killed: true, signal: 'SIGTERM' }`. The `code` type is the whole distinction.
+
+test('runCommand reports a killed command as an outcome instead of throwing', async () => {
+  const outcome = await runCommand(process.execPath, ['-e', 'setInterval(()=>{},1000)'], {
+    cwd: BUNDLE, signal: new AbortController().signal, timeoutMs: 400,
+  })
+  assert.equal(outcome.ok, false)
+  assert.equal(outcome.exitCode, null)
+  // The signal is the only thing that says *why* there is no exit code: Node discards a killed process's
+  // partial capture, so both streams come back empty — asserted here rather than assumed, because it is
+  // the reason this field exists instead of a sentence in `stderr`. Callers read a non-empty `stderr` as
+  // the process's own output; `probe.ts` appends it to the help excerpt.
+  assert.match(String(outcome.signal), /^SIG/, 'a killed command must name the signal that killed it')
+  assert.equal(outcome.stdout, '')
+  assert.equal(outcome.stderr, '')
+})
+
+test('runCommand still reports a non-zero exit as its code, not as a signal', async () => {
+  // The boundary the fix must not have moved: only a process with no exit code of its own loses it.
+  const outcome = await runCommand(process.execPath, ['-e', 'process.exit(3)'], {
+    cwd: BUNDLE, signal: new AbortController().signal, timeoutMs: 30_000,
+  })
+  assert.equal(outcome.ok, false)
+  assert.equal(outcome.exitCode, 3)
+  assert.equal(outcome.signal, null)
+})
+
 // ── Defect: probe reported a PATH-installed tool as missing ──────────────────────────────────────────
 //
 // `isFile('git')` on a bare name is false, so every correctly installed CLI on PATH was reported

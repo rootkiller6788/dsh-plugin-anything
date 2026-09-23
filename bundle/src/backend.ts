@@ -26,8 +26,21 @@ export interface CommandOutcome {
   readonly stdout: string
   /** Captured stderr, UTF-8. */
   readonly stderr: string
-  /** The exit code, or `null` when the process was killed by a signal. */
+  /**
+   * The exit code, or `null` when the process was killed before it could exit — which in this module means
+   * the timeout fired, since nothing else here kills a child.
+   */
   readonly exitCode: number | null
+  /**
+   * The signal that killed the process, when `exitCode` is `null`.
+   *
+   * It carries the reason a `null` exit code cannot: Node discards a killed process's partial capture, so
+   * `stdout` and `stderr` come back **empty** — measured, not assumed — and without this a timeout would be
+   * indistinguishable from a command that printed nothing. It is deliberately not written into `stderr`:
+   * callers treat a non-empty `stderr` as the process's own output, and `probe.ts` appends it to the help
+   * excerpt, so text invented here would be read back as something the target printed.
+   */
+  readonly signal?: string | null
 }
 
 /**
@@ -38,8 +51,10 @@ export interface CommandOutcome {
  * @param options.cwd - working directory.
  * @param options.signal - the caller's abort signal; honored on every call.
  * @param options.timeoutMs - cooperative timeout budget for this call.
- * @returns the outcome, including a non-zero exit.
- * @throws Error only when the process could not be started at all.
+ * @returns the outcome, including a non-zero exit and a process killed by the timeout.
+ * @throws Error only when there is no process outcome to report: the command could not be started
+ * (`ENOENT`), or the caller's own `signal` cancelled the call (`ABORT_ERR`). A command that ran is
+ * returned, however it ended.
  */
 export async function runCommand(
   command: string,
@@ -83,16 +98,26 @@ export async function runCommand(
     })
     return { ok: true, stdout, stderr, exitCode: 0 }
   } catch (cause) {
-    const error = cause as { code?: number | string; stdout?: string; stderr?: string }
-    // A spawn failure (ENOENT) has no numeric code; every other failure is an exit we want to report.
-    if (typeof error.code !== 'number') {
+    const error = cause as {
+      code?: number | string | null
+      signal?: string | null
+      stdout?: string
+      stderr?: string
+    }
+    // Three shapes arrive here, and `code`'s type is what separates them. A non-zero exit is a number. A
+    // process that ran and was killed before it could exit is `null` — `{ code: null, killed: true, signal:
+    // 'SIGTERM' }`, measured — and that is an outcome, not an exception: the caller wants "it ran and was
+    // killed", which is this module's timeout firing. A *string* code means there is no process outcome to
+    // report at all: `ENOENT` when it never started, `ABORT_ERR` when the caller's own signal cancelled it.
+    if (typeof error.code !== 'number' && error.code !== null) {
       throw new Error(`${command}: ${(cause as Error).message}`)
     }
     return {
       ok: false,
       stdout: error.stdout ?? '',
       stderr: error.stderr ?? '',
-      exitCode: error.code,
+      exitCode: typeof error.code === 'number' ? error.code : null,
+      signal: error.signal ?? null,
     }
   }
 }
