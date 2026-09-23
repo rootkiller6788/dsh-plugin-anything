@@ -214,6 +214,41 @@ test('accepts a bare row name that IS declared in dependencies', () => {
   } finally { rmSync(dir, { recursive: true, force: true }) }
 })
 
+test('rejects a patch row whose name is a relative path', () => {
+  // The Loader resolves it as `new URL(name, baseUrl)`, and for a bundle patch `baseUrl` is the profile
+  // directory — so the row imports something this package does not contain, and boot fails naming the
+  // row rather than the patch that caused it.
+  const dir = fixture({
+    'cordis.patch.yml': [
+      '- insert:',
+      "    - id: widget",
+      "      name: './some-relative-plugin'",
+      '',
+    ].join('\n'),
+  })
+  try {
+    const { status, stderr } = run(dir)
+    assert.equal(status, 1)
+    assert.match(stderr, /patch row names "\.\/some-relative-plugin", which is a path/)
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
+test('rejects a patch row whose name is an absolute path', () => {
+  const dir = fixture({
+    'cordis.patch.yml': [
+      '- insert:',
+      "    - id: widget",
+      "      name: '/opt/plugins/some-plugin'",
+      '',
+    ].join('\n'),
+  })
+  try {
+    const { status, stderr } = run(dir)
+    assert.equal(status, 1)
+    assert.match(stderr, /patch row names "\/opt\/plugins\/some-plugin", which is a path/)
+  } finally { rmSync(dir, { recursive: true, force: true }) }
+})
+
 test('rejects a dsh.bundle.patch that points at a file which does not exist', () => {
   // The declaration is present and named correctly; only the file is absent. Deleting it is the one
   // mutation that reaches this branch, since every earlier check passes on the declared path.

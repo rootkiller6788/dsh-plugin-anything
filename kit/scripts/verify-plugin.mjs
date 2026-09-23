@@ -169,9 +169,18 @@ function verifyPlugin(dir) {
     // A bundle naming ITSELF is the canonical case — a bundle patch mounts the package it ships in,
     // and a package does not depend on itself. This is what dsh-context-compressor's patch does.
     if (rowName === manifest.name) continue
-    // A relative or absolute path is resolved from the config dir, not from node_modules, so the
-    // dependencies rule does not apply to it.
-    if (rowName.startsWith('.') || rowName.startsWith('/')) continue
+    // A path-shaped name is legal to the Loader — `vendor/loader/src/config/tree.ts` imports it as
+    // `new URL(name, baseUrl)` — and that is precisely the hazard. For a bundle patch, `baseUrl` is
+    // set by app-boot to `dirname(absoluteConfigPath)`, which is the PROFILE directory, not this
+    // package; so the row resolves somewhere the package is not and fails at boot, with nothing
+    // pointing at the patch. This is the same baseUrl trap `kit/guides/skill-authoring.md` documents
+    // for skill mounting. It was exempt here on the reasoning that "the dependencies rule does not
+    // apply to a path", which is true and beside the point: no rule applied to it at all, while rule 2
+    // of the shipped `cordis.patch.yml.template` declared this gate enforced it.
+    if (rowName.startsWith('.') || rowName.startsWith('/')) {
+      fail(`${label}: patch row names "${rowName}", which is a path — a path in a bundle patch resolves from the profile directory, not from this package, so the row fails at boot. Use the package name`)
+      continue
+    }
     // An in-box bundle name always resolves from the dsh installation itself.
     if (rowName.startsWith('@deepseek-ai/')) continue
     if (!declared.has(rowName)) {
