@@ -11,7 +11,8 @@ hand-written tool — no wrapper package, no build, no publishing.
 
 ## What to give the user
 
-An opt-in row in their `cordis.yml` (or their profile's `cordis.patch.yml`):
+An opt-in row in their profile's `cordis.patch.yml` — **not** `cordis.yml`, which is the profile's include
+root and is rewritten on every boot, so a row added there is gone by the next one, and gone silently:
 
 ```yaml
 - id: mcp-<serverName>

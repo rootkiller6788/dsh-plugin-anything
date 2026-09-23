@@ -35,6 +35,17 @@
        正文按原样保留；本头部各条更正中的路径已写成 `kit/`，否则「更正」指向一个
        不存在的目录，读者会以为整棵树都作废。
 
+  5. §1.3-7  “**`cordis.yml` 的 `!!js` 仅可用于 `config`（任意深度）与 `disabled`**”
+     → 规则对，文件名错。这条约束的是 bundle patch；而 `cordis.yml` 是 profile 的
+       include root，`prepareProfile` 每次启动都把它重写成固定内容，写进去的文本就是
+       “Edit cordis.patch.yml, not this file.”（apps/cli/src/profile-boot.ts）。
+       更正见：kit/HARNESS.md §4「Design the patch rows」、§9
+
+  6. Context 一节 “没有特权内核，一切可从 `cordis.yml` 替换”
+     → 错，同上。用户自己的可编辑层是 `cordis.patch.yml` —— 它在每个 bundle 层之后
+       应用；`cordis.yml` 不是可编辑层，写进去的东西活不过一次启动。
+       更正见：README.md:85、kit/HARNESS.md §9
+
 另有一处值得记录：§1.5 引用的 skill 挂载写法 `new URL('skills/', baseUrl)` 在 agent
 preset 中正确，但在 **bundle patch 中会静默失效** —— baseUrl 由 app-boot 设为
 dirname(absoluteConfigPath)，在 patch 里那是 profile 目录而非包目录。它保留在正文中
