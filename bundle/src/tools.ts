@@ -503,11 +503,16 @@ export function registerTools(ctx: Context, options: ToolOptions): void {
       if (!(await isFile(candidate))) {
         return {
           ok: false,
-          output: `the kit's verifier was not found at ${candidate}`,
+          output: `no verifier was found at ${candidate}`,
           caveat: configured === ''
-            ? 'Set the verifierPath config to the absolute path of '
-              + 'kit/scripts/verify-plugin.mjs and retry.'
+            // The default is this package's own copy, so a miss here means the install is incomplete
+            // rather than that the user picked a wrong path — and an installed bundle has no `kit/` to
+            // point at, which is what the previous wording told them to do.
+            ? 'That is the copy this package ships; if it is missing the install is incomplete. Point '
+              + 'the verifierPath config at another copy of the gate — `kit/scripts/verify-plugin.mjs` '
+              + 'in a checkout — and retry.'
             : 'The configured verifierPath does not exist.',
+
         }
       }
       const outcome = await runCommand(process.execPath, [candidate, args.path], {

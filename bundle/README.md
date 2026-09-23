@@ -61,9 +61,10 @@ one that does not resolve is **reported as a failure**, never as a pass the tool
 
 ## What this bundle does not do
 
-It does not reimplement the kit's rules. The static gate stays in
-`kit/scripts/verify-plugin.mjs` and this plugin shells out to it, so there is one
-implementation of each rule rather than two that drift.
+It does not reimplement the kit's rules. There is one implementation of each rule, the gate at
+`kit/scripts/verify-plugin.mjs`, and this package ships a copy of that file rather than a second
+implementation — the copy at `scripts/verify-plugin.mjs`, which is what the verify tool runs by
+default. Two paths to one implementation, not two that drift.
 
 `plugin_anything_promote` writes the package body it read; it does not invent the surrounding manifest and
 patch. That is `plugin_anything_scaffold`'s job, so the template story keeps a single source of truth.
