@@ -68,7 +68,11 @@ export function probeMeta(meta: unknown): ProbeMeta | undefined {
   return kind === undefined || recommendation === undefined ? undefined : { kind, recommendation }
 }
 
-/** The payload `plugin_anything_scaffold` and `plugin_anything_promote` project. */
+/**
+ * The payload projected by every tool that reports files it wrote: `plugin_anything_scaffold`,
+ * `plugin_anything_compile`, `plugin_anything_package` — one file, so a one-element `written` — and
+ * `plugin_anything_promote`. These four are the presenters that narrow through `filesMeta`.
+ */
 export interface FilesMeta {
   /** The bundle root the files were written under. */
   readonly root: string
