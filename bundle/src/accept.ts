@@ -2,7 +2,7 @@
  * Acceptance: the tail of the pipeline as one verdict.
  *
  * Stages 8 and 11–16 — build, compose, boot, discover, invoke, present, replay — are each a separate way to
- * be wrong, and running them as five manual steps means one gets skipped and nobody notices. This module
+ * be wrong, and running them as seven manual steps means one gets skipped and nobody notices. This module
  * runs them and returns a single answer.
  *
  * **The rule that makes the answer worth having: a stage that did not run is never a pass.**
