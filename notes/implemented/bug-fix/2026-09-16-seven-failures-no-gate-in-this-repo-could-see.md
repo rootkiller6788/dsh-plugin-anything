@@ -1,4 +1,4 @@
-# Agent Note: Six failures no gate in this repo could see, all found by compiling, booting, and calling
+# Agent Note: Seven failures no gate in this repo could see, all found by compiling, booting, and calling
 
 Status: implemented
 
@@ -6,7 +6,7 @@ Status: implemented
 
 The kit's static gate passed, every one of its checks was proven to reject a mutant, a bundle rendered from
 the templates satisfied all of them, and all tests were green. Then the generated code was compiled,
-installed into a real `dsh`, and called by a real model — and **six defects surfaced**, none of them of a
+installed into a real `dsh`, and called by a real model — and **seven defects surfaced**, none of them of a
 kind any gate in this repository could detect by construction.
 
 1. **`presentResult` was written against the wrong type.** The templates and all five of the bundle's own
@@ -56,7 +56,7 @@ Windows, where a shell splits `D:\Program Files\nodejs\node.exe` on the space an
 
 ## Decision
 
-Fix all four at their source, and add the layer that finds this class of defect:
+Fix each at its source, and add the layer that finds this class of defect:
 
 - **`presentResult` correctness** — `presentationMeta` on every tool definition, presenters narrowed through
   per-tool `xFromMeta` helpers that decline to `undefined` rather than assert, mirroring `tool-fs`'s
