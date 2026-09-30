@@ -288,8 +288,16 @@ Attach presenters to the definition. Returning `undefined`, or omitting the meth
 fallback (title = tool name, raw args as input).
 
 ```ts
+// `result` is a `ToolResult` — `{ content, isError, meta? }` — **not** the value `execute` returned, so
+// `result.stdout` does not exist. A card reads only what `presentationMeta` projected, narrowed back out
+// of `result.meta`; a mismatch returns `undefined` and falls back to generic rather than throwing. The
+// narrowing helpers are in `guides/tool-contract.md` — this is the one place a presenter goes wrong.
+output: { schema: { /* … */ }, presentationMeta: (_args, value) => ({ stdout: value.stdout }) },
 presentCall(args) { return { card: 'terminal', title: `git ${args.args.join(' ')}`, cwd: args.cwd } }
-presentResult(args, result) { return { card: 'terminal', title: 'git', output: result.stdout } }
+presentResult(_args, result) {
+  const meta = result.meta as { stdout?: string } | undefined
+  return { card: 'terminal', title: 'git', output: meta?.stdout }
+}
 ```
 
 Call cards: `generic` (`title`, optional `kind`, `rawInput`, `content`, `locations`), `terminal`
