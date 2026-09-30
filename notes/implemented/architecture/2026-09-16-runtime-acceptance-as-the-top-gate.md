@@ -48,8 +48,16 @@ with the command for each. It stops honestly rather than pretending to cover wha
 
 ## Consequences
 
-- `scripts/acceptance.mjs` reports 15/15 deterministic rungs on a healthy tree, and names the six keyed
-  steps it cannot run.
+- `scripts/acceptance.mjs` prints `passed/total` for the deterministic rungs it ran — the total is
+  `results.length`, counted from the rungs themselves — and names the six keyed steps it cannot run.
+- **Correction: that total is 28, not 15.** This bullet originally read "reports 15/15 deterministic rungs on
+  a healthy tree". Run on this tree, the script prints `✔ 28/28 deterministic rungs passed`. It printed the
+  same on the day this note was written: `0b059af` is also the script's only commit, and
+  `git diff 0b059af HEAD -- scripts/acceptance.mjs` is empty, so neither side moved. Twelve of the rungs —
+  three suites and nine — come out of two `for` loops over test-file arrays rather than from any line of the
+  script a reader would count, and a count taken from the call sites is short by exactly those. That is the
+  reason to leave the figure out of prose: the loops grow as the suite does, and a number in a note does
+  not.
 - The ladder's top rung was exercised for real. A model created a dynamic cordis package via
   `cordis_define`, ran it, and called it (`dynamic-ok`); a restart made it **disappear**;
   `plugin_anything_promote` read it through `dynamicCordisRunner.inspectPackage`; the source was converted,
