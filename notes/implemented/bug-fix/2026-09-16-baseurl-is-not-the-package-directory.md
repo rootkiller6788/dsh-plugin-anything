@@ -65,8 +65,16 @@ wrong, which is precisely why it needed verifying rather than assuming.
 - The template carries a comment block explaining the evaluation semantics, so the next person to touch it
   does not "simplify" it back to the broken form.
 - `guides/skill-authoring.md` documents the trap with both the wrong and right forms.
-- **This remains unverified against a live `dsh`.** No in-repo package ships a skill inside a bundle —
-  `find packages apps -type d -name skills` returns only the `cordis` preset's — so the mechanism is
-  untrodden. The reasoning is sound and the semantics are read from the loader source, but a live
-  `skill({name})` call has not been observed working. `guides/skill-authoring.md` and
-  `guides/verification.md` both say so rather than implying it works.
+- **Correction: the row is no longer unproven, though one step of it still is.** This bullet originally said
+  the mechanism was untrodden and unverified against a live `dsh`, on the grounds that no package in the
+  `dsh` repo ships a skill inside a bundle — `find packages apps -type d -name skills` returns only the
+  `cordis` preset's. What changed: a bundle ships its own `skills/` directory and the model listed the skill
+  from `<available_skills>`. The listing is the evidence for the whole path rather than for the listing
+  alone — this row is the only thing in such a profile that puts the package's `skills/` in front of the
+  provider, so a skill that appears there is a skill this row resolved — and `guides/verification.md` moved
+  the mechanism from its "unproven" list to its "evidence that now exists" list on that basis. What is still
+  unobserved is the step after the listing, a live `skill({name})` call. The `dsh` repo precedent is
+  unchanged; this repository now ships the two exceptions, `bundle/skills/dsh-plugin-anything-bundle/` and
+  `examples/dsh-plugin-git/skills/dsh-plugin-git/`, both mounted by the `createRequire(baseUrl)` row above.
+  So `guides/skill-authoring.md` telling a bundle author to verify their own bundle end to end is still the
+  right instruction — now with worked examples to compare against rather than only the loader source.

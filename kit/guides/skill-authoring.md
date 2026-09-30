@@ -118,6 +118,9 @@ keep in step with the packaged copy.
 
 No package in the `dsh` repo ships a skill in its bundle: `find packages apps -type d -name skills` returns
 exactly one directory, the `cordis` preset's. The mechanism supports it (add to `files`, mount a
-`skill-filesystem` row) but it is untrodden ground. Verify it end to end with
+`skill-filesystem` row) but the `dsh` repo has no example to copy. This repository has two, which is where
+to copy the row from: `bundle/cordis.patch.yml` and `examples/dsh-plugin-git/cordis.patch.yml`. A skill
+mounted that way has been observed to reach the model's `<available_skills>` listing; what has not been
+observed is the next step, a live `skill({name})` call. Verify yours end to end with
 `dsh --profile <p> --dump-config` plus a live `skill({name})` call before claiming it works — see
 `verification.md`.
