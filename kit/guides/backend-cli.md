@@ -58,11 +58,18 @@ A tool that runs a command should present as a terminal card — the model's cal
 the user's UI should say so:
 
 ```ts
+// `output.presentationMeta` is the only channel a presenter sees structured data through.
+output: { schema: { /* … */ }, presentationMeta: (_args, value) => ({ stdout: value.stdout }) },
+
 presentCall(args) {
   return { card: 'terminal', title: `${backend.command} ${args.subcommand} ${args.target}`, cwd: args.cwd }
 }
 presentResult(_args, result) {
-  return { card: 'terminal', title: basename(backend.command), output: result.stdout }
+  // `result` is a `ToolResult` — `{ content, isError, meta? }` — not the value `execute` returned, so
+  // `result.stdout` does not exist. Narrow `result.meta` and decline to `undefined` on any mismatch: the
+  // card falls back to generic, which is what keeps a replayed log from another version rendering.
+  const meta = result.meta as { stdout?: string } | undefined
+  return { card: 'terminal', title: basename(backend.command), output: meta?.stdout }
 }
 ```
 
