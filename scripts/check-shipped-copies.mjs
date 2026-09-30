@@ -2,16 +2,19 @@
 /**
  * Assert that what the bundle ships is identical to the kit's originals.
  *
- * The bundle has to carry its own copies of three things, because a user who installs it from a tarball has
- * no repository around it:
+ * The bundle has to carry its own copies, because a user who installs it from a tarball has no repository
+ * around it:
  *
- *   - `sop/HARNESS.md`        the procedure the skill tells the agent to read
- *   - `templates/`            what `plugin_anything_scaffold` renders from
- *   - `scripts/verify-plugin.mjs`  what `plugin_anything_verify` runs
+ *   - `sop/HARNESS.md`            the procedure the skill tells the agent to read
+ *   - `templates/`                what `plugin_anything_scaffold` renders from
+ *   - `scripts/verify-plugin.mjs` what `plugin_anything_verify` runs
+ *   - `docs/runtime-acceptance.md` the ladder the SOP links to for the stages it does not cover
+ *   - `LICENSE`                   the license text npm publishes with the package
  *
- * The kit remains the single source of truth for all three. A copy that is not checked is a second source
- * of truth that drifts silently — and this project has been bitten by exactly that twice (`private: true`,
- * and the registry format). So the copies are pinned here, loudly.
+ * The repository remains the single source of truth for every one of them — the kit for its own files,
+ * `docs/` and the root `LICENSE` for theirs. A copy that is not checked is a second source of truth that
+ * drifts silently — and this project has been bitten by exactly that twice (`private: true`, and the
+ * registry format). So the copies are pinned here, loudly.
  *
  * Fixing a mismatch: edit the KIT's file, then re-run this script with `--sync`.
  *
