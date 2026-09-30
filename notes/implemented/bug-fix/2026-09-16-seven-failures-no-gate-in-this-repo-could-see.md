@@ -48,11 +48,12 @@ kind any gate in this repository could detect by construction.
    conversion for real: the typecheck said `TS1108: A 'return' statement can only be used within a function
    body`.
 
-Two smaller defects came from the same discipline rather than from a gate. `scripts/typecheck-example.mjs`
-called `process.exit(1)` from inside its `try`, and `process.exit` does not run `finally` blocks — so it
-leaked a temp directory on every failure. And `scripts/acceptance.mjs` set `shell: true` unconditionally on
-Windows, where a shell splits `D:\Program Files\nodejs\node.exe` on the space and every rung invoking
-`process.execPath` failed with `'D:\Program' is not recognized`.
+Two smaller defects came from the same discipline rather than from a gate.
+`bundle/scripts/typecheck-example.mjs` called `process.exit(1)` from inside its `try`, and `process.exit`
+does not run `finally` blocks — so it leaked a temp directory on every failure. And
+`scripts/acceptance.mjs` set `shell: true` unconditionally on Windows, where a shell splits
+`D:\Program Files\nodejs\node.exe` on the space and every rung invoking `process.execPath` failed with
+`'D:\Program' is not recognized`.
 
 ## Decision
 
