@@ -102,7 +102,7 @@ Fix all four at their source, and add the layer that finds this class of defect:
   and the tree settles (proven by the failure landing on `MISSING_CREDENTIAL` rather than on our plugin).
 - `bundle/tests/registration.test.mjs` asserts the built `apply` registers the documented tools, that the
   entry is a function plugin with no default export, that every definition carries `presentationMeta`, and
-  that `promote` stays out of a host without `cordisInspect`.
+  that `promote` stays out of a host without `dynamicCordisRunner`.
 - **The general lesson, which is the reason this note exists:** four gates — format, types, build, and
   composition — each find a class of defect the others cannot, and **none of them finds the class that only
   a real call finds**. `promote`'s wrong service name survived all four: it is not a format violation, it
