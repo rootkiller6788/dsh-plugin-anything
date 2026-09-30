@@ -109,7 +109,7 @@ Fix all four at their source, and add the layer that finds this class of defect:
   typechecks (against a local interface), it builds, and it composes. It would have failed on the first
   user who tried it. And defect 5 is only visible when a real model asks about a real tool on a real machine.
 - **Evidence now exists for what was previously listed as unproven**: the model sees and calls the tools
-  (a real turn listed all four and called `plugin_anything_probe` on `git`, yielding `kind: cli,
+  (a real turn listed all eight and called `plugin_anything_probe` on `git`, yielding `kind: cli,
   callable: true`); a presenter renders from a real logged `tool/result`; and a bundle ships its own skill,
   discovered through `createRequire` and listed by the model from `<available_skills>`.
 - What remains unproven is now much narrower: promotion against a **live** dynamic package (the contract is
