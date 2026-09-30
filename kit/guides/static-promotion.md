@@ -91,7 +91,7 @@ Four things the promotion must add that the dynamic package never needed:
 3. **Error handling at the boundary.** The sandbox reports failures into a Run card the model can see and
    repair. A bundle fails in front of a user, so `apply` must fail loud at load for self-contained problems
    (missing backend binary, invalid config) and each tool must return a well-formed value or throw.
-4. **Lifetime discipline.** `codis_run` installed the package under a fiber the toolset managed.
+4. **Lifetime discipline.** `cordis_run` installed the package under a fiber the toolset managed.
    In a bundle, `apply`'s registrations are owned by the fiber automatically — so do not carry over any
    manual teardown, and do not hoist a registration to module scope.
 
